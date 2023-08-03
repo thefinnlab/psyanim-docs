@@ -1,7 +1,6 @@
 <!-- _navbar.md -->
 
 * [Psyanim 2.0](https://github.com/thefinnlab/psyanim-2)
-* [Psyanim 2.0 Docs](https://thefinnlab.github.io/psyanim-docs/)
 * [Psyanim 2.0 API](https://thefinnlab.github.io/psyanim-api-docs/)
 * [Psyanim-CLI](https://github.com/thefinnlab/psyanim-cli)
 * [Psyanim-Examples](https://github.com/thefinnlab/psyanim-examples)
