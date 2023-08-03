@@ -26,17 +26,17 @@ When building experiments using [jsPsych](https://www.jspsych.org/), we can run 
 
 ***You'll need to make sure you have read access to our psyanim-2 and psyanim-cli private git repos***
 
-Create a directory named 'hello-psyanim2' and navigate to it in your terminal.
+**a. Create a directory named 'hello-psyanim2' and navigate to it in your terminal.**
 
-Create a new npm project with:
+**b. Create a new npm project with:**
 
     npm init -y
 
-Install psyanim-2 package straight from the git repo via npm with:
+**c. Install psyanim-2 package straight from the git repo via npm with:**
 
     npm install git+https://github.com/thefinnlab/psyanim-2.git
 
-Install psyanim-cli package straight from git repo via npm with:
+**d. Install psyanim-cli package straight from git repo via npm with:**
 
     npm install git+https://github.com/thefinnlab/psyanim-cli.git
 
@@ -50,7 +50,7 @@ At any time, you can run `npx psyanim-cli --help` to see the docs for Psyanim CL
 
     npm install --global http-server
 
-In the 'hello-psyanim2' directory we created in the previous step, create a new experiment using the Psyanim CLI:
+**a. In the 'hello-psyanim2' directory we created in the previous step, create a new experiment using the Psyanim CLI:**
 
     npx psyanim-cli --init
 
@@ -62,7 +62,7 @@ You should now see the following files created under ./src:
 
 You should also see a `.gitignore` and a `webpack.config.js` automatically generated for your experiment, and your package.json updated with some helpful commands for building with webpack, deploying to firebase, etc.
 
-Let's go ahead and initialize a git repository and commit what we have so far!
+**b. Let's go ahead and initialize a git repository and commit what we have so far!**
 
     git init
     git add .
@@ -70,47 +70,25 @@ Let's go ahead and initialize a git repository and commit what we have so far!
 
 At this stage, we have an experiment with just one empty scene.  Let's add another scene.
 
-## TODO: everything after this still needs to be updated!
+# 4. Creating our first scene using Psyanim CLI
 
-## 3. Creating our first experiment using the Psyanim CLI
+**a. Back in the terminal, run the following command to create a scene named 'MyFirstScene':**
 
-Follow these steps to create a new project:
+    npx psyanim-cli -s MyFirstScene
 
-**a. Open a terminal, navigate to the root of the Psyanim 2.0 repository and run:**
+You should see `MyFirstScene.js` show up under `./src/`.
 
-    npm i
+Let's add this new scene to our `index.js` file.
 
-**b. Run the following command to create a 'helloPsyanim' experiment:**
-    
-    node ./tools/psyanim_cli.mjs helloPsyanim
-
-You should now see the following files created under ./experiments/helloPsyanim:
-
-- `EmptyScene.js`
-- `index.html`
-- `index.js`
-
-You should also see a webpack config automatically generated for your experiment and package.json updated with a couple commands for building with webpack.
-
-At this stage, we have an experiment with just one empty scene.  Let's add another scene.
-
-**c. Back in the terminal, run the following command to create a scene named 'MyFirstScene':**
-
-    node .\tools\psyanim_cli.mjs helloPsyanim -s MyFirstScene
-
-You should see `MyFirstScene.js` show up under `./experiments/helloPsyanim`.
-
-Let's see how to add this new scene to our `index.js` file.
-
-**d. Open `index.js` and add the following import to the top of the file:**
+**b. Open `index.js` and add the following import to the top of the file:**
 
     import MyFirstScene from './MyFirstScene';
 
-**e. Let's register `MyFirstScene` with `PsyanimApp` by adding the following line right before `Psyanim.Instance.run()`:**
+**c. Let's register `MyFirstScene` with `PsyanimApp` by adding the following line right before `Psyanim.Instance.run()`:**
 
     PsyanimApp.Instance.config.registerScene(MyFirstScene);
 
-**e. Next, let's declare a trial `myfirstSceneTrial` after the `emptySceneTrial` is declared by adding the following code after it:**
+**d. Next, let's declare a trial `myfirstSceneTrial` after the `emptySceneTrial` is declared by adding the following code after it:**
 
     let myFirstSceneTrial = {
         type: PsyanimJsPsychPlugin,
@@ -120,19 +98,17 @@ Let's see how to add this new scene to our `index.js` file.
         sceneParameters: { }
     };
 
-**f. Now let's add this new trial we defined to the line with `jspsych.run()`, by replacing it with the following line:**
+**e. Now let's add this new trial we defined to the line with `jspsych.run()`, by replacing it with the following line:**
 
     jsPsych.run([welcome, emptySceneTrial, myFirstSceneTrial, goodbye]);
 
-**g. After these modifications, your `index.js` should look like the following:**
+**After these modifications, your `index.js` should look like the following:**
 
     import { initJsPsych } from 'jspsych';
 
     import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 
-    import PsyanimJsPsychPlugin from '../../src/integrations/PsyanimJsPsychPlugin';
-
-    import PsyanimApp from '../../src/core/PsyanimApp';
+    import { PsyanimApp, PsyanimJsPsychPlugin } from 'psyanim2';
 
     import EmptyScene from './EmptyScene';
     import MyFirstScene from './MyFirstScene';
@@ -152,7 +128,7 @@ Let's see how to add this new scene to our `index.js` file.
     */
 
     const userID = 'Jason';
-    const experimentName = 'helloPsyanim';
+    const experimentName = 'defaultExperimentName';
 
     const jsPsych = initJsPsych();
 
@@ -184,29 +160,32 @@ Let's see how to add this new scene to our `index.js` file.
 
     jsPsych.run([welcome, emptySceneTrial, myFirstSceneTrial, goodbye]);
 
-**h. Run `npm run helloPsyanim-build` in your terminal and then look in the ./dist directory to see your index.html.  Load this in your browser using whatever static file server you prefer.**
+**f. Run `npm run build` in your terminal and then look in the ./dist directory to see your index.html.  Load this in your browser using whatever static file server you prefer.**
 
 - If you hit `F12` to open the chrome debug tools, you'll be able to see the console output from the app.
 - To load the `EmptyScene` and `MyFirstScene` trials we added to jsPsych, just hit `Enter` on your keyboard.
 - You should see the console say what scenes are loaded as you move through the trials.
 
-### Congratulations, you've created your first experiment with a user-defined scene!
+**Congratulations, you've created your first experiment with a user-defined scene!**
 
-## 3. Creating our first entity and component using the Psyanim CLI
+# 5. Creating our first entity and component using the Psyanim CLI
 
 **a. Back in our terminal, let's create our first component `MyFirstMovementComponent` by running the following command:**
 
-    node .\tools\psyanim_cli.mjs helloPsyanim -c MyFirstMovementComponent
+    npx psyanim-cli -c MyFirstMovementComponent
 
-You should see MyFirstMovementComponent.js
+You should see `MyFirstMovementComponent.js` under `/src/`.
 
 **b. Open up `MyFirstScene.js` and add the following code so the imports at the top and your `create` method looks like the following:**
 
     import Phaser from 'phaser';
 
-    import PsyanimScene from '../../src/core/scene/PsyanimScene';
+    import 
+    { 
+        PsyanimScene,
+        PsyanimConstants,
 
-    import PsyanimConstants from '../../src/core/PsyanimConstants';
+    } from 'psyanim2';
 
     import MyFirstMovementComponent from './MyFirstMovementComponent';
 
@@ -222,6 +201,11 @@ You should see MyFirstMovementComponent.js
         init() {
             
             super.init();
+        }
+
+        preload() {
+            
+            super.preload();
         }
 
         create() {
@@ -253,18 +237,22 @@ Notice we add our `MyFirstMovementComponent` to our `agent1` entity with a simpl
 
     import Phaser from 'phaser';
 
-    import PsyanimComponent from '../../src/core/PsyanimComponent';
+    import { PsyanimComponent } from 'psyanim2';
 
     export default class MyFirstMovementComponent extends PsyanimComponent {
 
-        speed = 0.5;
+        speed;
 
         constructor(entity) {
 
             super(entity);
+
+            this.speed = 0.5;
         }
 
         update(t, dt) {
+
+            super.update(t, dt);
 
             let oldPosition = this.entity.position;
 
@@ -298,4 +286,4 @@ Note that using `this.entity` within a component will return a reference to the 
 
 - Remember to watch the console to see what scene is loaded when you are in a `PsyanimJsPsychPlugin` trial.
 
-### Congratulations, you've created your first movement component and attached it to an entity in the scene to control its movement!
+**Congratulations, you've created your first movement component and attached it to an entity in the scene to control its movement!**
