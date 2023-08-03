@@ -30,15 +30,21 @@ When building experiments using [jsPsych](https://www.jspsych.org/), we can run 
 
 **b. Create a new npm project with:**
 
+```bash
     npm init -y
+```
 
 **c. Install psyanim-2 package straight from the git repo via npm with:**
 
+```bash
     npm install git+https://github.com/thefinnlab/psyanim-2.git
+```
 
 **d. Install psyanim-cli package straight from git repo via npm with:**
 
+```bash
     npm install git+https://github.com/thefinnlab/psyanim-cli.git
+```
 
 ## 3. Creating our first psyanim-2 experiment using the Psyanim CLI
 
@@ -48,11 +54,15 @@ At any time, you can run `npx psyanim-cli --help` to see the docs for Psyanim CL
 
 **Optional:** Install http-server (unless you have your own static file server tool) and refer to the [docs](https://www.npmjs.com/package/http-server) to host your builds locally
 
+```bash
     npm install --global http-server
+```
 
 **a. In the 'hello-psyanim2' directory we created in the previous step, create a new experiment using the Psyanim CLI:**
 
+```bash
     npx psyanim-cli --init
+```
 
 You should now see the following files created under ./src:
 
@@ -64,9 +74,11 @@ You should also see a `.gitignore` and a `webpack.config.js` automatically gener
 
 **b. Let's go ahead and initialize a git repository and commit what we have so far!**
 
+```bash
     git init
     git add .
     git commit -m "created my first psyanim experiment!"
+```
 
 At this stage, we have an experiment with just one empty scene.  Let's add another scene.
 
@@ -74,7 +86,9 @@ At this stage, we have an experiment with just one empty scene.  Let's add anoth
 
 **a. Back in the terminal, run the following command to create a scene named 'MyFirstScene':**
 
+```bash
     npx psyanim-cli -s MyFirstScene
+```
 
 You should see `MyFirstScene.js` show up under `./src/`.
 
@@ -82,14 +96,19 @@ Let's add this new scene to our `index.js` file.
 
 **b. Open `index.js` and add the following import to the top of the file:**
 
+```js
     import MyFirstScene from './MyFirstScene';
+```
 
 **c. Let's register `MyFirstScene` with `PsyanimApp` by adding the following line right before `Psyanim.Instance.run()`:**
 
+```js
     PsyanimApp.Instance.config.registerScene(MyFirstScene);
+```
 
 **d. Next, let's declare a trial `myfirstSceneTrial` after the `emptySceneTrial` is declared by adding the following code after it:**
 
+```js
     let myFirstSceneTrial = {
         type: PsyanimJsPsychPlugin,
         sceneKey: MyFirstScene.KEY,
@@ -97,13 +116,17 @@ Let's add this new scene to our `index.js` file.
         userID: userID,
         sceneParameters: { }
     };
+```
 
 **e. Now let's add this new trial we defined to the line with `jspsych.run()`, by replacing it with the following line:**
 
+```js
     jsPsych.run([welcome, emptySceneTrial, myFirstSceneTrial, goodbye]);
+```
 
 **After these modifications, your `index.js` should look like the following:**
 
+```js
     import { initJsPsych } from 'jspsych';
 
     import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
@@ -159,6 +182,7 @@ Let's add this new scene to our `index.js` file.
     };
 
     jsPsych.run([welcome, emptySceneTrial, myFirstSceneTrial, goodbye]);
+```
 
 **f. Run `npm run build` in your terminal and then look in the ./dist directory to see your index.html.  Load this in your browser using whatever static file server you prefer.**
 
@@ -172,12 +196,15 @@ Let's add this new scene to our `index.js` file.
 
 **a. Back in our terminal, let's create our first component `MyFirstMovementComponent` by running the following command:**
 
+```bash
     npx psyanim-cli -c MyFirstMovementComponent
+```
 
 You should see `MyFirstMovementComponent.js` under `/src/`.
 
 **b. Open up `MyFirstScene.js` and add the following code so the imports at the top and your `create` method looks like the following:**
 
+```js
     import Phaser from 'phaser';
 
     import 
@@ -226,6 +253,7 @@ You should see `MyFirstMovementComponent.js` under `/src/`.
             super.update(t, dt);
         }
     }
+```
 
 In the `create` method above, we add an entity called `agent1`.
 
@@ -235,6 +263,7 @@ Notice we add our `MyFirstMovementComponent` to our `agent1` entity with a simpl
 
 **c. Open MyFirstMovementComponent.js and add the following code to have the agent move back and forth horizontally:**
 
+```js
     import Phaser from 'phaser';
 
     import { PsyanimComponent } from 'psyanim2';
@@ -275,6 +304,7 @@ Notice we add our `MyFirstMovementComponent` to our `agent1` entity with a simpl
             this.entity.position = oldPosition;
         }
     }
+```
 
 The `update` method above is called every frame (60 times per second).
 
