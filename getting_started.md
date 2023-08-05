@@ -26,21 +26,21 @@ When building experiments using [jsPsych](https://www.jspsych.org/), we can run 
 
 ***You'll need to make sure you have read access to our psyanim-2 and psyanim-cli private git repos***
 
-**a. Create a directory named 'hello-psyanim2' and navigate to it in your terminal.**
+### a. Create a directory named 'hello-psyanim2' and navigate to it in your terminal.
 
-**b. Create a new npm project with:**
+### b. Create a new npm project with:
 
 ```bash
     npm init -y
 ```
 
-**c. Install psyanim-2 package straight from the git repo via npm with:**
+### c. Install psyanim-2 package straight from the git repo via npm with:
 
 ```bash
     npm install git+https://github.com/thefinnlab/psyanim-2.git
 ```
 
-**d. Install psyanim-cli package straight from git repo via npm with:**
+### d. Install psyanim-cli package straight from git repo via npm with:
 
 ```bash
     npm install git+https://github.com/thefinnlab/psyanim-cli.git
@@ -58,7 +58,7 @@ At any time, you can run `npx psyanim-cli --help` to see the docs for Psyanim CL
     npm install --global http-server
 ```
 
-**a. In the 'hello-psyanim2' directory we created in the previous step, create a new experiment using the Psyanim CLI:**
+### a. In the 'hello-psyanim2' directory we created in the previous step, create a new experiment using the Psyanim CLI:
 
 ```bash
     npx psyanim-cli --init
@@ -66,13 +66,13 @@ At any time, you can run `npx psyanim-cli --help` to see the docs for Psyanim CL
 
 You should now see the following files created under ./src:
 
-- `EmptyScene.js`
-- `index.html`
-- `index.js`
+- `index.js`: entry-point into the application
+- `index.html`: HTML web page that will contain the Psyanim canvas
+- `EmptyScene.js`: a blank PsyanimScene
 
 You should also see a `.gitignore` and a `webpack.config.js` automatically generated for your experiment, and your package.json updated with some helpful commands for building with webpack, deploying to firebase, etc.
 
-**b. Let's go ahead and initialize a git repository and commit what we have so far!**
+### b. Let's go ahead and initialize a git repository and commit what we have so far!
 
 ```bash
     git init
@@ -84,7 +84,7 @@ At this stage, we have an experiment with just one empty scene.  Let's add anoth
 
 # 4. Creating our first scene using Psyanim CLI
 
-**a. Back in the terminal, run the following command to create a scene named 'MyFirstScene':**
+### a. Back in the terminal, run the following command to create a scene named 'MyFirstScene':
 
 ```bash
     npx psyanim-cli -s MyFirstScene
@@ -94,19 +94,19 @@ You should see `MyFirstScene.js` show up under `./src/`.
 
 Let's add this new scene to our `index.js` file.
 
-**b. Open `index.js` and add the following import to the top of the file:**
+### b. Open `index.js` and add the following import to the top of the file:
 
 ```js
     import MyFirstScene from './MyFirstScene';
 ```
 
-**c. Let's register `MyFirstScene` with `PsyanimApp` by adding the following line right before `Psyanim.Instance.run()`:**
+### c. Let's register `MyFirstScene` with `PsyanimApp` by adding the following line right before `Psyanim.Instance.run()`:
 
 ```js
     PsyanimApp.Instance.config.registerScene(MyFirstScene);
 ```
 
-**d. Next, let's declare a trial `myfirstSceneTrial` after the `emptySceneTrial` is declared by adding the following code after it:**
+### d. Next, let's declare a trial `myfirstSceneTrial` after the `emptySceneTrial` is declared by adding the following code after it:
 
 ```js
     let myFirstSceneTrial = {
@@ -118,7 +118,7 @@ Let's add this new scene to our `index.js` file.
     };
 ```
 
-**e. Now let's add this new trial we defined to the line with `jspsych.run()`, by replacing it with the following line:**
+### e. Now let's add this new trial we defined to the line with `jspsych.run()`, by replacing it with the following line:
 
 ```js
     jsPsych.run([welcome, emptySceneTrial, myFirstSceneTrial, goodbye]);
@@ -184,7 +184,7 @@ Let's add this new scene to our `index.js` file.
     jsPsych.run([welcome, emptySceneTrial, myFirstSceneTrial, goodbye]);
 ```
 
-**f. Run `npm run build` in your terminal and then look in the ./dist directory to see your index.html.  Load this in your browser using whatever static file server you prefer.**
+### f. Run `npm run build` in your terminal and then look in the ./dist directory to see your index.html.  Load this in your browser using whatever static file server you prefer.
 
 - If you hit `F12` to open the chrome debug tools, you'll be able to see the console output from the app.
 - To load the `EmptyScene` and `MyFirstScene` trials we added to jsPsych, just hit `Enter` on your keyboard.
@@ -194,7 +194,7 @@ Let's add this new scene to our `index.js` file.
 
 # 5. Creating our first entity and component using the Psyanim CLI
 
-**a. Back in our terminal, let's create our first component `MyFirstMovementComponent` by running the following command:**
+### a. Back in our terminal, let's create our first component `MyFirstMovementComponent` by running the following command:
 
 ```bash
     npx psyanim-cli -c MyFirstMovementComponent
@@ -202,7 +202,7 @@ Let's add this new scene to our `index.js` file.
 
 You should see `MyFirstMovementComponent.js` under `/src/`.
 
-**b. Open up `MyFirstScene.js` and add the following code so the imports at the top and your `create` method looks like the following:**
+### b. Open up `MyFirstScene.js` and add the following code so the imports at the top and your `create` method looks like the following:
 
 ```js
     import Phaser from 'phaser';
@@ -261,7 +261,7 @@ The `agent1` entity has a red circle representation in the scene and is centered
 
 Notice we add our `MyFirstMovementComponent` to our `agent1` entity with a simple call to `addComponent`.
 
-**c. Open MyFirstMovementComponent.js and add the following code to have the agent move back and forth horizontally:**
+### c. Open MyFirstMovementComponent.js and add the following code to have the agent move back and forth horizontally:
 
 ```js
     import Phaser from 'phaser';
@@ -308,11 +308,15 @@ Notice we add our `MyFirstMovementComponent` to our `agent1` entity with a simpl
 
 The `update` method above is called every frame (60 times per second).
 
-Inside the `update` method, we've added code to compute the speed of the entity, then compute it's displacement from it's speed and the `dt` (or 'delta time') parameter supplied to `update`, and then add that displacement to the entity's current position.
+Inside the `update` method, we've added code to compute the velocity of the entity, then compute it's displacement from it's velocity and the `dt` (or 'delta time') parameter supplied to `update`, and then add that displacement to the entity's current position.
 
 Note that using `this.entity` within a component will return a reference to the entity which the component is attached to.
 
-**d. Rebuild your ./dist bundle and reload the page in your browser and you should be able to see your agent moving back and forth on-screen by using the 'enter' key to load the experiment scenes!**
+### d. Rebuild your ./dist bundle and reload the page in your browser and you should be able to see your agent moving back and forth on-screen by using the 'enter' key to load the experiment scenes!
+
+<p align="center">
+  <img src="./imgs/getting_started_final_result.gif" />
+</p>
 
 - Remember to watch the console to see what scene is loaded when you are in a `PsyanimJsPsychPlugin` trial.
 
