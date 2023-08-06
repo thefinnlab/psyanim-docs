@@ -256,7 +256,7 @@ To start, delete all the code we added to the `update(t, dt)` method and replace
     }
 ```
 
-This code comments above explain the basic movement algorithm.
+The code comments above explain the basic movement algorithm.
 
 The `update(t, dt)` method is called each simulation frame (60 times per second).
 
