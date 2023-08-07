@@ -10,11 +10,9 @@ The `PsyanimScene` class acts as a container for `PsyanimEntity` objects.
 
 Any object in your simulation that needs a position or orientation in the scene, a visual representation in the scene, or needs to have physics applied to it should be added to the scene as an entity.
 
-To build a more intuitive feel for this, let's create a scene with an entity we can control via the keyboard.
+To build a more intuitive feel for this, let's build a player controller from the ground up - we'll create a scene with an entity we can control via the keyboard.
 
-## 2. Building a player controller from the ground up
-
-### a. Setup your npm project and install psyanim-2
+## 2. Project Setup: Create your npm project and install psyanim-2
 
 Let's start by opening a terminal (or powershell if that's your thing :) and creating a directory called `hello-psyanim-scenes`.
 
@@ -36,7 +34,7 @@ Now, we can initialize our psyanim experiment with:
     npx psyanim-cli --init
 ```
 
-### b. Setup our scene where we will implement our player controller.
+## 3. Scene Setup: Create our scene where we will implement our player controller.
 
 Let's go ahead and delete the `EmptyScene.js` under `./src/`.
 
@@ -136,7 +134,7 @@ Navigate to the url for your project in Google Chrome and you should see a blank
 
 If you open up the Chrome Dev Tools and look at the `console` output, you should see `hello player controller!` printed out.
 
-### c. Getting familiar with the `update(t, dt)` method: Adding keyboard controls.
+## 4. The Update() Method: Getting familiar with the `update(t, dt)` method: Adding keyboard controls.
 
 To get familiar with the update() method, and also to learn how to process keyboard inputs, let's setup some keyboard inputs and print some messages in response to those keypresses at runtime.
 
@@ -184,7 +182,7 @@ If you click on the canvas to give it focus, and then press any of the 'W', 'A',
 
 Congratulations, you've learned how to process keyboard control input in real-time with just a few lines of code!
 
-### d. Creating an entity and adding it to the scene
+## 5. Player Entity: Creating an entity and adding it to the scene
 
 Next, let's add a player character to the scene for us to control via the keyboard.
 
@@ -218,7 +216,7 @@ Hop back on over to the Chrome browser and you should see your blue, triangle sh
   <img src="./imgs/psyanim_scenes_player_entity.png" />
 </p>
 
-### e. Making our entity move in response to keyboard controls
+## 6. Player Controller: Making our entity move in response to keyboard controls
 
 Next, let's get our 'player' entity moving around in response to the WASD keyboard controls.
 
@@ -355,7 +353,7 @@ Hop back over to your web browser and you should be able to see your 'player' en
   <img src="./imgs/scenes_and_entities_final.gif" />
 </p>
 
-## 3. Summary of Scenes and Entities
+## 7. Summary of Scenes and Entities
 
 In this tutorial, we created a barebones `Psyanim 2.0 application` with just a single `scene`.
 
