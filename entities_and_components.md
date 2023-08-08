@@ -1,5 +1,7 @@
 # Entities and Components
 
+## NOTE: this is still a work-in-progress and missing key explanations in certain areas.  Also will be making more concise by moving finished class defs to a separate git repo.  Will be completed soon tho!
+
 ## 1. What's a component?
 
 To this point, we've learned that `scenes` are like a stage where characters and animations are presented to the user, and `entities` are *things* that live in `scenes`.
@@ -442,26 +444,23 @@ export default class MyCollectibleItem extends PsyanimComponent {
             this.entity.destroy();
         }
     }
-
-    update(t, dt) {
-        
-        super.update(t, dt);
-    }
 }
 ```
 
-Now open up `MyLevel1.js` and add the following import at the top of the file:
+Now open up `MyLevel1.js`, `MyLevel2.js`, and `MyLevel3.js` and add the following import at the top of each file:
 
 ```js
     import MyCollectibleItem from './MyCollectibleItem';
 ```
 
-Then create an `entity` for our `collectible item` and add a `MyCollectibleItem` component to it:
+In `MyLevel1.js` create an `entity` for our `collectible item` and add a `MyCollectibleItem` component to it:
 
 ```js
-    let collectible = this.addEntity('collectible1', 100, 100, {
+    // add a single collectible
+    let collectible = this.addEntity('collectible', 600, 500, {
         shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE, 
-        radius: 8, color: 0xbf40bf
+        radius: 5, color: 0xbf40bf,
+        textureKey: 'purple_collectible'
     },
     {
         isSensor: true
@@ -470,4 +469,326 @@ Then create an `entity` for our `collectible item` and add a `MyCollectibleItem`
     collectible.addComponent(MyCollectibleItem);
 ```
 
-Notice the `isSensor` field of the last JSON parameter in our `addEntity()` call.  When this is set to true, we can still receive collision events for this entity, but it will not impart or receive any impulses.
+Notice the `isSensor` field of the last object parameter in our `addEntity()` call.  When this is set to true, we can still receive collision events for this entity, but it will not impart or receive any impulses.
+
+Also notice the `textureKey` field in the second to last object parameter.  Whenever we create an `entity` with a particular shape, a texture is generated for it with a particular key.  We can override this key's value by setting it in the `textureKey` field.
+
+If we supply a `textureKey` that's already got a texture generated for it, the entity will use that texture instead of generating a new one.  This is a helpful optimization if you have a lot of entities with the same shape, size and color.
+
+Now that we've added one collectible to our `MyLevel1` scene, reload the app in your browser and you should be able to move your player character over to it.
+
+The `collectible` should disappear when you touch it and the Chrome Debug Tools will show 'collectible picked up!'.
+
+Open `MyLevel2.js` and add the following code at the end of the `create()` method:
+
+```js
+        // setup collectibles
+        let collectibleSpawnPoints = [
+            { x: 100, y: 100 },
+            { x: 100, y: 500 },
+            { x: 700, y: 100 },
+            { x: 700, y: 500 },
+        ];
+
+        for (let i = 0; i < collectibleSpawnPoints.length; ++i)
+        {
+            let collectible = this.addEntity('collectible' + i, 
+            collectibleSpawnPoints[i].x, collectibleSpawnPoints[i].y, {
+                shapeType: PsyanimConstants.SHAPE_TYPE.RECTANGLE, 
+                width: 8, height: 8, color: 0x0000ff,
+                textureKey: 'blue_collectible'
+            },
+            {
+                isSensor: true
+            });
+    
+            collectible.setAngle(45);
+
+            collectible.addComponent(MyCollectibleItem);    
+        }
+```
+
+Here, we add 4 blue diamond-shaped `collectibles` by creating 4 collectible entities with a blue square shape and then rotating the squares 45 degrees.
+
+Notice that we were able to define a set of spawn points for the collectibles in pixel coordinates and then call `this.addEntity()` in a loop to add collectibles to the scene at that point.
+
+Also notice that we use the same `textureKey` value for each collectible, as an optimization, since they all can share the same texture.
+
+Reload the app in your browser and hit the '2' key on your keyboard to load up scene 2 and you should see 4 diamond-shaped collectibles that disappear when you touch them, leaving a note in console that they were picked up.
+
+We'll add some collectibles to `MyLevel3`, but to make it more interesting, let's make these collectibles move!
+
+## 10. Modularity by Design: Creating a tweening component
+
+In this section, we'll see how to use Phaser's Tween functionality from a PsyanimComponent, in turn getting more practice using Phaser 3's powerful feature-set from within a PsyanimComponent!
+
+```bash
+    npx psyanim-cli -c MyTweener
+```
+
+```js
+import Phaser from 'phaser';
+
+import { PsyanimComponent } from 'psyanim2';
+
+export default class MyTweener extends PsyanimComponent {
+
+    point1;
+    point2;
+
+    duration;
+
+    constructor(entity) {
+
+        super(entity);
+
+        this.duration = 3000;
+
+        this._boundStartTween = this._startTween.bind(this);
+
+        this.scene.events.on('create', this._boundStartTween);
+    }
+
+    destroy() {
+
+        if (this._tween)
+        {
+            this._tween.stop();
+            this._tween.destroy();
+            this._tween = null;
+        }
+
+        if (this._boundStartTween)
+        {
+            // make sure we unsub from the scene's create callback
+            this.scene.events.off('create', this._boundStartTween);
+            this._boundStartTween = null;
+        }
+
+        super.destroy();
+    }
+
+    _startTween() {
+
+        // set this entity's position to point1
+        this.entity.position = this.point1;
+
+        // set this entity to yoyo tween to point2
+        this._tween = this.scene.add.tween({
+            targets: this.entity,
+            x: this.point2.x,
+            y: this.point2.y,
+            duration: this.duration,
+            yoyo: true,
+            ease: 'Linear',
+            repeat: -1
+        });
+    }
+}
+```
+
+## 11. Combining Multiple Components
+
+```js
+import Phaser from 'phaser';
+
+import 
+{ 
+    PsyanimScene,
+    PsyanimConstants
+
+} from 'psyanim2';
+
+import MyLevelLoader from './MyLevelLoader';
+import MyPlayerController from './MyPlayerController';
+import MyCollectibleItem from './MyCollectibleItem';
+import MyTweener from './MyTweener';
+
+export default class MyLevel3 extends PsyanimScene {
+
+    static KEY = 'MyLevel3';
+
+    constructor() {
+
+        super(MyLevel3.KEY);
+    }
+
+    create() {
+
+        super.create();
+
+        let sceneControls = this.addEntity('sceneControls');
+        sceneControls.addComponent(MyLevelLoader);
+
+        let player = this.addEntity('player', 400, 300, {
+            shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE,
+            base: 15, altitude: 30, color: 0x0000ff
+        });
+
+        player.addComponent(MyPlayerController);
+
+        // setup collectibles
+        let tweenPoints = [
+            [
+                { x: 100, y: 100 },
+                { x: 700, y: 100 }
+            ],
+            [
+                { x: 700, y: 100 },
+                { x: 700, y: 550 }
+            ],
+        ];
+
+        for (let i = 0; i < tweenPoints.length; ++i)
+        {
+            let collectible = this.addEntity('collectible' + i, 
+                tweenPoints[i].x, tweenPoints[i].y, {
+                shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE, 
+                base: 24, altitude: 20, color: 0x00ff00,
+                textureKey: 'green_collectible'
+            },
+            {
+                isSensor: true
+            });
+    
+            collectible.setAngle(-90);
+
+            collectible.addComponent(MyCollectibleItem);    
+
+            let tweener = collectible.addComponent(MyTweener);
+            tweener.point1 = tweenPoints[i][0];
+            tweener.point2 = tweenPoints[i][1];
+        }
+    }
+}
+```
+
+## 12. Adding Game Logic: Creating a Game Manager
+
+Here we add an event emitter to `MyCollectibleItem.js` for component communication.
+
+`constructor`:
+
+```js
+    this.events = new Phaser.Events.EventEmitter();
+```
+
+`_handleCollision()`:
+
+```js
+    _handleCollision(matterCollisionData) {
+
+        let collidedWithPlayer = false;
+
+        // check bodyA and bodyB to see if either one belongs to the 'player' entity
+        if (matterCollisionData.bodyA.gameObject)
+        {
+            collidedWithPlayer = matterCollisionData.bodyA.gameObject.name == 'player';
+        }
+        else if (matterCollisionData.bodyB.gameObject)
+        {
+            collidedWithPlayer = matterCollisionData.bodyB.gameObject.name == 'player';
+        }
+
+        if (collidedWithPlayer)
+        {
+            this.events.emit('collected', this);
+
+            this.entity.destroy();
+        }
+    }
+```
+
+Here we implement the game manager component:
+
+```bash
+    npx psyanim-cli -c MyGameManager
+```
+
+```js
+import Phaser from 'phaser';
+
+import { PsyanimComponent } from 'psyanim2';
+
+import MyCollectibleItem from './MyCollectibleItem';
+
+export default class MyGameManager extends PsyanimComponent {
+
+    constructor(entity) {
+
+        super(entity);
+
+        this._boundOnAfterSceneCreated = this._onAfterSceneCreated.bind(this);
+
+        // we get the collectibles *after* scene::create() method is completed
+        this.scene.events.on('create', this._boundOnAfterSceneCreated);
+    }
+
+    _onAfterSceneCreated() {
+
+        this._collectibles = this.scene.getComponentsByType(MyCollectibleItem);
+
+        this._collectibles.forEach(collectible => {
+
+            collectible.events.on('collected', (c) => {
+
+                this._removeCollectible(c);
+                this._checkIfWonGame();
+            });
+        })
+    }
+
+    _removeCollectible(collectible) {
+
+        let index = this._collectibles.indexOf(collectible);
+
+        if (index >= 0)
+        {
+            this._collectibles.splice(index, 1);
+        }
+        else
+        {
+            console.error("Failed to find collectible to remove!");
+        }
+    }
+
+    _checkIfWonGame() {
+
+        if (this._collectibles.length == 0)
+        {
+            console.log('Great job - you found all the collectibles!');
+        }
+    }
+
+    destroy() {
+
+        if (this._boundOnAfterSceneCreated)
+        {
+            // unsub from the 
+            this.scene.events.off('create', this._boundOnAfterSceneCreated);
+            this._boundOnAfterSceneCreated = null;
+        }
+
+        super.destroy();
+    }
+
+    update(t, dt) {
+        
+        super.update(t, dt);
+    }
+}
+```
+
+In `MyLevel1.js`, `MyLevel2.js`, and `MyLevel3.js`, let's add our Game Manager by adding the following import at the top:
+
+```js
+    import MyGameManager from './MyGameManager';
+```
+
+Then, in each of those level scene files, add the following lines in your create method:
+
+```js
+    // setup game manager
+    this.addEntity('gameManager')
+        .addComponent(MyGameManager);
+```
