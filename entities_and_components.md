@@ -2,6 +2,8 @@
 
 ## NOTE: this is still a work-in-progress and missing key explanations in certain areas.  Also will be making more concise by moving finished class defs to a separate git repo.  Will be completed soon tho!
 
+Full tutorial project + code available [here](https://github.com/thefinnlab/hello-psyanim-components-tutorial).
+
 ## 1. What's a component?
 
 To this point, we've learned that `scenes` are like a stage where characters and animations are presented to the user, and `entities` are *things* that live in `scenes`.
