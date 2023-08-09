@@ -8,7 +8,7 @@ The framework is built on top of [Phaser 3](https://phaser.io/) and has a flexib
 
 In Psyanim 2.0, everything that is seen in the world lives in a `PsyanimScene`.
 
-Any object that exists in a scene, regardless of its visual representation, is called an `PsaynimEntity`.
+Any object that exists in a scene, regardless of its visual representation, is called an `PsyanimEntity`.
 
 A `PsyanimEntity` is simply a container for `PsyanimComponents`.  
 
