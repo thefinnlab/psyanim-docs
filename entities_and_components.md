@@ -111,8 +111,8 @@ There are only *four* very simple relationships you'll need to remember to acces
 
 - A `PsyanimScene` *is* a `Phaser.Scene`.
 - A `PsyanimEntity` *is* a `Phaser.Physics.Matter.Sprite`.
-- A `PsyanimComponent` has a reference to the `PsyanimEntity` to which it is attached.
-- A `PsyanimEntity` has a reference to the `PsyanimScene` in which it exists.
+- A `PsyanimComponent` *has* a reference to the `PsyanimEntity` to which it is attached.
+- A `PsyanimEntity` *has* a reference to the `PsyanimScene` in which it exists.
 
 Thus, we can access any `Phaser.Scene` property or method via a `PsyanimScene` reference and can use any of the Phaser APIs anywhere in a `PsyanimScene` or `PsyanimComponent`.
 
@@ -126,9 +126,9 @@ Right now, our game has 3 levels, but the first level loaded on app start is the
 
 Once our `MyLevel1` scene loads, it will remain the active scene in our game until we load a different level from our code.
 
-Since we want to be able to load a level from any scene, it's not ideal to copy / paste our level loading code into every single scene we create.
+We want to be able to load a level from any scene and it's not ideal to copy / paste our level loading code into every single scene we create.
 
-Instead, let's create a `PsyanimComponent`, called `MyLevelLoader`, which can be added to any scene which allows us to load a level via a keypress.
+Instead, let's create a `PsyanimComponent`, called `MyLevelLoader`, which can be added to any scene, allowing us to load a level via a keypress.
 
 To create the component in our project, simply navigate to our project directory in your terminal and run:
 
@@ -197,7 +197,25 @@ Here, again, we access the entity to which this component is attached via `this.
 
 We then grab the scene plugin reference via `this.entity.scene.scene`, as per the [Phaser.Scene](https://newdocs.phaser.io/docs/3.60.0/Phaser.Scene) APIs.
 
-Finally, we check to see if any of the keys we setup were pressed, and if so, we load the corresponding scene (`MyLevel1`, `MyLevel2`, or `MyLevel3`).
+Finally, we check to see if any of the keys we setup were pressed ('1', '2', or '3' keys), and if so, we load the corresponding scene (`MyLevel1`, `MyLevel2`, or `MyLevel3`).
+
+Open up your `MyLevel1.js`, `MyLevel2.js` and `MyLevel3.js` files and add the following import at the top:
+
+```js
+    import MyLevelLoader from './MyLevelLoader';
+```
+
+Then, in each file, add the following lines to your `create()` methods to add a 'sceneControls' entity to the scene and attach a `MyLevelLoader` component to it:
+
+```js
+    create() {
+
+        super.create();
+
+        let sceneControls = this.addEntity('sceneControls');
+        sceneControls.addComponent(MyLevelLoader);
+    }
+```
 
 The full source for your `MyLevelLoader` component should look like [this](https://github.com/thefinnlab/hello-psyanim-components-tutorial/blob/master/src/MyLevelLoader.js).
 
@@ -230,7 +248,7 @@ Next, in the first level, let's add a green circle-shaped player by calling `add
         let sceneControls = this.addEntity('sceneControls');
         sceneControls.addComponent(MyLevelLoader);
 
-        this.addEntity('player', 400, 300, {
+        let player = this.addEntity('player', 400, 300, {
             shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE,
             radius: 12, color: 0x00ff00
         });
@@ -247,7 +265,7 @@ create() {
     let sceneControls = this.addEntity('sceneControls');
     sceneControls.addComponent(MyLevelLoader);
 
-    this.addEntity('player', 400, 300, {
+    let player = this.addEntity('player', 400, 300, {
         shapeType: PsyanimConstants.SHAPE_TYPE.RECTANGLE,
         width: 50, height: 30, color: 0xffff00
     });
@@ -264,7 +282,7 @@ create() {
     let sceneControls = this.addEntity('sceneControls');
     sceneControls.addComponent(MyLevelLoader);
 
-    this.addEntity('player', 400, 300, {
+    let player = this.addEntity('player', 400, 300, {
         shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE,
         base: 15, altitude: 30, color: 0x0000ff
     });
@@ -281,7 +299,7 @@ Let's create a new component, `MyPlayerContorller`, using Psyanim CLI in termina
     npx psyanim-cli -c MyPlayerController
 ```
 
-Open up `MyPlayerController.js` under `./src/` and declare 'speed' and 'turnSpeed' variables at the class-level, then initialize them in the constructor like so:
+Open up `MyPlayerController.js` under `./src/` and declare 'speed' and 'turnSpeed' variables at the class-level, then initialize them in the `constructor` like so:
 
 ```js
     ...
@@ -300,7 +318,7 @@ Open up `MyPlayerController.js` under `./src/` and declare 'speed' and 'turnSpee
     ...
 ```
 
-We'll need to access keyboard inputs in our update loop, so let's initialize the keys we're listening for at the end of our constructor:
+We'll need to access keyboard inputs in our `update()` loop, so let's initialize the keys we're listening for at the end of our `constructor`:
 
 ```js
         // setup keyboard controls for this scene
@@ -312,7 +330,7 @@ We'll need to access keyboard inputs in our update loop, so let's initialize the
         };
 ```
 
-Add the following movement algorithm to your update code as follows:
+Add the following movement algorithm to your `update()` code as follows:
 
 ```js
     update(t, dt) {
@@ -355,6 +373,19 @@ What is of interest to us in `MyPlayerController` is that `speed` and `turnSpeed
 Also, note that the `setVelocity()` and `setAngle()` methods are called on `this.entity` now, because this component should work for any `PsyanimEntity` it's attached to.
 
 For reference, the full MyPlayerController class code can be found [here](https://github.com/thefinnlab/hello-psyanim-components-tutorial/blob/master/src/MyPlayerController.js).
+
+All that's left to do is add the player controller to the `player` entity in our scenes.  Open up `MyLevel1`, `MyLevel2`, and `MyLevel3` and add the following import statement at the top of each file:
+
+```js
+    import MyPlayerController from './MyPlayerController';
+```
+
+Then add the following line of code at the end of our `create()` method in each scene file:
+```js
+    player.addComponent(MyPlayerController);
+```
+
+Reload the app in your browser and you should be able to control the player in all 3 scenes!
 
 ## 8. Object Interaction: Creating some collectibles or pickups
 
@@ -414,7 +445,7 @@ Moreover, this class exposes a `Phaser.Events.EventEmitter` reference through it
 
 This class essentially plugins into Phaser's sprite `setOnCollide()` method and then, any time a physics body collides with the entity this component is attached to, we check to see if it's the player.
 
-If it is the player, we emit a `collected` event to anyone who is listening and then calls `destroy()` on the entity it's attached to, which is the expected behavior for an item the player can 'pickup' or 'collect'.
+If it is the player, we emit a `collected` event to anyone who is listening and then call `destroy()` on the entity it's attached to, which is the expected behavior for an item the player can 'pickup' or 'collect'.
 
 Now open up `MyLevel1.js`, `MyLevel2.js`, and `MyLevel3.js` and add the following import at the top of each file:
 
@@ -446,7 +477,7 @@ If we supply a `textureKey` that's already got a texture generated for it, the e
 
 Now that we've added one collectible to our `MyLevel1` scene, reload the app in your browser and you should be able to move your player character over to it.
 
-The `collectible` should disappear when you touch it and the Chrome Debug Tools will show 'collectible picked up!'.
+The `collectible` should disappear when you touch it.
 
 Open `MyLevel2.js` and add the following code at the end of the `create()` method:
 
@@ -483,7 +514,7 @@ Notice that we were able to define a set of spawn points for the collectibles in
 
 Also notice that we use the same `textureKey` value for each collectible, as an optimization, since they all can share the same texture.
 
-Reload the app in your browser and hit the '2' key on your keyboard to load up scene 2 and you should see 4 diamond-shaped collectibles that disappear when you touch them, leaving a note in console that they were picked up.
+Reload the app in your browser and hit the '2' key on your keyboard to load up scene 2 and you should see 4 diamond-shaped collectibles that disappear when you touch them.
 
 We'll add some collectibles to `MyLevel3`, but to make it more interesting, let's make these collectibles move!
 
@@ -519,7 +550,7 @@ Open up `MyTweener.js` under `./src/` and declare `point1`, `point2`, and `durat
 
 Notice that we didn't initialize `point1` and `point2` in the constructor above.  This is because we expect the 'users' of this component to initialize those fields when this component is added to an entity in a `PsyanimScene`'s `create()` method.
 
-Let's create a private `_startTween()` method in `MyTweener` class that actually creates the Tween in phaser and keeps it `yo-yo-ing`` back and forth forever:
+Let's create a private `_startTween()` method in `MyTweener` class that actually creates the Tween in phaser and keeps it 'yo-yo-ing' back and forth forever:
 
 ```js
     _startTween() {
@@ -572,7 +603,7 @@ To do this, simply add the following method to our `MyTweener` class:
 
 Finally, we need to actually kick off our `_startTween()` method, but we don't want it to be called from the `constructor` of the component, because the `constructor` is typically called from a `PsyanimScene`'s `create()` method and we want to start our `tween` *after* the `create()` method is finished executing, but before our `component` goes into it's regular `update(t, dt)` loop.
 
-Why do we want to wait until the `PsyanimScene`'s `create()` method is finished executing before starting our `tween` animation, you ask?  We want to give the user a chance to initialize the `point1` and `point2` variables with whatever values they want when they are creating the `entities` and `components` for this `scene`.
+Why do we want to wait until the `PsyanimScene`'s `create()` method is finished executing before starting our `tween` animation, you ask?  We want to give the user a chance to initialize the `point1` and `point2` variables with whatever values they want when they are creating the `entities` and `components` for a `scene`.
 
 To accomplish this, every `component` has an `afterCreate()` method that can be overriden and is only called once during it's lifetime, right after the `PsyanimScene`'s `create()` method is finished executing.
 
@@ -665,7 +696,7 @@ Update the `create()` method of `MyLevel3` class as follows:
     }
 ```
 
-Notice that, in the code above, all we had to do to add a `MyTweener` animation was add the `component` to the collectible `entity` and then set the two endpoints of the tween by assigning them to the `point1` and `point2` fields!
+Notice that, in the code above, all we had to do to add a `MyTweener` animation was add the `component` to the collectible `entity` and then set the two endpoints of the tween by assigning them to the `point1` and `point2` fields on our `tweener` component reference!
 
 The complete `MyLevel3` class can be found [here](https://github.com/thefinnlab/hello-psyanim-components-tutorial/blob/master/src/MyLevel3.js).
 
@@ -719,9 +750,9 @@ It clears the console to make it easy to see the current game state for this lev
 
 Then, it uses the `PsyanimScene`'s `getComponentsByType()` method to get all components of type `MyCollectibleItem` in the scene.
 
-This is a really helpful method for anytime we have a lot of `entities` with a particular `component` attached that we want to access, but be careful to remember that the scene is dynamic and 'when' you call it is just as important as 'where' you call it.
+This is a really helpful method for anytime we have a lot of `entities` with a particular `component` attached that we want to access.
 
-Once we have a reference to all the `collectibles` in the scene, we setup an event handler for the `collectibles`' 'collected' event that removes the `collectible` from our `this._collectibles` array and then checks to see if we won the game.
+Once we have a reference to all the `collectibles` in the scene, we setup an event handler for the `collectibles'` 'collected' event that removes the `collectible` from our `this._collectibles` array and then checks to see if we won the game.
 
 When the player picks up a `collectible`, we'll need to remove it from our `this._collectibles` array.
 

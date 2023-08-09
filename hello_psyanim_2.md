@@ -1,4 +1,4 @@
-# Getting started with Psyanim 2.0
+# Getting started quickly with Psyanim 2.0
 
 ## 1. Core concepts
 
