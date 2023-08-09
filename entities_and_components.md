@@ -30,7 +30,11 @@ In the following tutorial, we'll explore `PsyanimComponents` in depth.
 
 To build a more intuitive feel for the power of `PsyanimComponents` and how best to utilize them, we can create a simple game consisting of 3 levels.
 
-The 'levels' will be implemented as `PsyanimScenes` and all of our game logic will be implemented in `PsyanimComponents`.
+The `levels` will be implemented as `PsyanimScenes` and all of our game logic will be implemented in `PsyanimComponents`.
+
+The goal of our game will be to 'pickup' all the 'collectible' items in each level.  
+
+For simplicity, and to focus on the Psyanim coding aspect, rather than HTML GUI dev, we will output game state to the console.
 
 ## 2. Project Setup: Setup your npm project and install psyanim-2
 
@@ -772,5 +776,13 @@ Then, in each of those level scene files, add the following lines in your create
     this.addEntity('gameManager')
         .addComponent(MyGameManager);
 ```
+
+Reload your game in the browser and open the console to see the game state.  It should look like the following:
+
+<p align="center">
+  <img src="./imgs/entities_and_components_game_final.gif" />
+</p>
+
+Remember, use the '1', '2', and '3' keys to switch between `levels`.
 
 **Congratulations - you've made your first game with multiple levels in Psyanim 2.0!**
