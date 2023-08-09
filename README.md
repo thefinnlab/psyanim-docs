@@ -16,4 +16,4 @@ These are a bit longer, but should give you a solid foundation to build interact
 
 ---
 
-For more advanced examples, check out the [test scenes](https://github.com/thefinnlab/psyanim-2/tree/master/test/scenes) in the [Psyanim 2.0](https://github.com/thefinnlab/psyanim-2/tree/master) repo, as well as the [Psyanim Examples](https://github.com/thefinnlab/psyanim-examples) repo.
+For more advanced examples, including how to use Psyanim 2.0 Core components, check out the [test scenes](https://github.com/thefinnlab/psyanim-2/tree/master/test/scenes) in the [Psyanim 2.0](https://github.com/thefinnlab/psyanim-2/tree/master) repo, as well as the [Psyanim Examples](https://github.com/thefinnlab/psyanim-examples) repo.
