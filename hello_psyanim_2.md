@@ -58,6 +58,8 @@ At any time, you can run `npx psyanim-cli --help` to see the docs for Psyanim CL
     npm install --global http-server
 ```
 
+Note: If you're on linux / macOS, you may need to prepend 'sudo' to the start of global npm install commands and have appropriate privileges to install packages globally, such as 'http-server' above.
+
 ### a. In the 'hello-psyanim2' directory we created in the previous step, create a new experiment using the Psyanim CLI:
 
 ```bash
