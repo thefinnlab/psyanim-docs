@@ -387,7 +387,7 @@ Then add the following line of code at the end of our `create()` method in each 
 
 Reload the app in your browser and you should be able to control the player in all 3 scenes!
 
-## 8. Object Interaction: Creating some collectibles or pickups
+## 8. Component Communication: Object interaction with collectibles
 
 Let's create a `MyCollectibleItem` component using Psyanim CLI:
 
@@ -441,7 +441,13 @@ export default class MyCollectibleItem extends PsyanimComponent {
 
 At class-level, we have declared a `player` field which the user of this component will need to populate with an entity reference.
 
+This is an important aspect of `Component Communication`, or how components communicate with other components and entities.
+
+A common, reliable mechanism for component communication is simply to add a field to the component class which references other entities or components.
+
 Moreover, this class exposes a `Phaser.Events.EventEmitter` reference through it's `this.events` property.  This allows any users of this component to handle the `collected` event.
+
+Component Events are slightly more complex to use and implement, but are a better choice for `Component Communication` than direct references in situations like this, where the component should not know about other specific components or entities.
 
 This class essentially plugins into Phaser's sprite `setOnCollide()` method and then, any time a physics body collides with the entity this component is attached to, we check to see if it's the player.
 
