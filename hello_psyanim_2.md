@@ -1,5 +1,7 @@
 # Getting started quickly with Psyanim 2.0
 
+Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2-tutorial).
+
 ## 1. Core concepts
 
 Psyanim 2.0 is a framework for creating browser-based psychology / cognitive science research experiments involving 2D procedural animation.

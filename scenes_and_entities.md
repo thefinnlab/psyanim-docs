@@ -1,5 +1,7 @@
 # Scenes and Entities
 
+Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim-scenes-tutorial).
+
 ## 1. The Psyanim Scene and Psyanim Entity
 
 A `Psyanim Scene` is an abstraction for the 2D world we are simulating.
@@ -266,86 +268,7 @@ We then update the player's orientation by lerping towards the direction vector'
 
 There are many variations of movement algorithms used for character control, but most are fundamentally the same (maybe with a 3rd dimension to deal with).
 
-When you have reached this point, your `PlayerControllerTestScene.js` file should look like the following:
-
-```js
-import Phaser from 'phaser';
-
-import { 
-
-    PsyanimScene,
-    PsyanimConstants
-
-} from 'psyanim2';
-
-export default class PlayerControllerTestScene extends PsyanimScene {
-
-    static KEY = 'PlayerControllerTestScene';
-
-    constructor() {
-
-        super(PlayerControllerTestScene.KEY);
-    }
-
-    create() {
-
-        super.create();
-
-        console.log('hello player controller!');
-
-        // setup keyboard controls for this scene
-        this._keys = {
-            W: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-            A: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-            S: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-            D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
-        };
-
-        // create 'player' entity in scene at center of canvas (400, 300)
-        this._player = this.addEntity('player', 400, 300, {
-            shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE,
-            base: 16, altitude: 32, 
-            color: 0x0000ff
-        });
-    }
-
-    update(t, dt) {
-
-        super.update(t, dt);
-
-        // define translational and rotational speeds
-        const speed = 8;
-        const turnSpeed = 0.2;
-
-        // get horizontal and vertical movement inputs
-        let horizontal = (this._keys.A.isDown ? -1 : 0) + (this._keys.D.isDown ? 1 : 0);
-        let vertical = (this._keys.W.isDown ? -1 : 0) + (this._keys.S.isDown ? 1 : 0);
-
-        // compute velocity direction from keyboard inputs and set to desired speed
-        let velocity = new Phaser.Math.Vector2(horizontal, vertical)
-            .setLength(speed);
-
-        // here we actually set the translational velocity of the 'player' entity:
-        this._player.setVelocity(velocity.x, velocity.y);
-
-        // next we will adjust our orientation based on our control input directions
-        if (Math.abs(horizontal) > 1e-3 || Math.abs(vertical) > 1e-3)
-        {
-            const targetAngle = Math.atan2(vertical, horizontal);
-
-            // we don't snap to the target angle immediately... 
-            // instead we lerp smoothly to it using Phaser's built-in 'RotateTo' method
-            let newAngle = Phaser.Math.Angle.RotateTo(
-                this._player.angle * Math.PI / 180,
-                targetAngle,
-                turnSpeed);
-
-            // here, we actually set the player's orientation based on the lerped value
-            this._player.setAngle(newAngle * 180 / Math.PI);
-        }
-    }
-}
-```
+When you have reached this point, your `PlayerControllerTestScene.js` file should look like [this](https://github.com/thefinnlab/hello-psyanim-scenes-tutorial/blob/master/src/PlayerControllerTestScene.js).
 
 Hop back over to your web browser and you should be able to see your 'player' entity moving around nice and smooth in response to WASD keypresses!
 
