@@ -422,11 +422,11 @@ export default class MyCollectibleItem extends PsyanimComponent {
         // check bodyA and bodyB to see if either one belongs to the 'player' entity
         if (matterCollisionData.bodyA.gameObject)
         {
-            collidedWithPlayer = matterCollisionData.bodyA.gameObject.name == 'player';
+            collidedWithPlayer = matterCollisionData.bodyA == this.player.body;
         }
         else if (matterCollisionData.bodyB.gameObject)
         {
-            collidedWithPlayer = matterCollisionData.bodyB.gameObject.name == 'player';
+            collidedWithPlayer = matterCollisionData.bodyB == this.player.body;
         }
 
         if (collidedWithPlayer)
@@ -463,7 +463,7 @@ In `MyLevel1.js` create an `entity` for our `collectible item` and add a `MyColl
 
 ```js
     // add a single collectible
-    let collectible = this.addEntity('collectible', 600, 500, {
+    let item = this.addEntity('item', 600, 500, {
         shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE, 
         radius: 5, color: 0xbf40bf,
         textureKey: 'purple_collectible'
@@ -472,7 +472,8 @@ In `MyLevel1.js` create an `entity` for our `collectible item` and add a `MyColl
         isSensor: true
     });
 
-    collectible.addComponent(MyCollectibleItem);
+    let collectible = item.addComponent(MyCollectibleItem);
+    collectible.player = player;
 ```
 
 Notice the `isSensor` field of the last object parameter in our `addEntity()` call.  When this is set to true, we can still receive collision events for this entity, but it will not impart or receive any impulses.
@@ -498,19 +499,20 @@ Open `MyLevel2.js` and add the following code at the end of the `create()` metho
 
         for (let i = 0; i < collectibleSpawnPoints.length; ++i)
         {
-            let collectible = this.addEntity('collectible' + i, 
+            let item = this.addEntity('item' + i, 
             collectibleSpawnPoints[i].x, collectibleSpawnPoints[i].y, {
                 shapeType: PsyanimConstants.SHAPE_TYPE.RECTANGLE, 
                 width: 8, height: 8, color: 0x0000ff,
-                textureKey: 'blue_collectible'
+                textureKey: 'blue_item'
             },
             {
                 isSensor: true
             });
     
-            collectible.setAngle(45);
+            item.setAngle(45);
 
-            collectible.addComponent(MyCollectibleItem);    
+            let collectible = item.addComponent(MyCollectibleItem);
+            collectible.player = player; 
         }
 ```
 
@@ -681,21 +683,22 @@ Update the `create()` method of `MyLevel3` class as follows:
 
         for (let i = 0; i < tweenPoints.length; ++i)
         {
-            let collectible = this.addEntity('collectible' + i, 
+            let item = this.addEntity('item' + i, 
                 tweenPoints[i].x, tweenPoints[i].y, {
                 shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE, 
                 base: 24, altitude: 20, color: 0x00ff00,
-                textureKey: 'green_collectible'
+                textureKey: 'green_item'
             },
             {
                 isSensor: true
             });
     
-            collectible.setAngle(-90);
+            item.setAngle(-90);
 
-            collectible.addComponent(MyCollectibleItem);    
+            let collectible = item.addComponent(MyCollectibleItem);    
+            collectible.player = player;
 
-            let tweener = collectible.addComponent(MyTweener);
+            let tweener = item.addComponent(MyTweener);
             tweener.point1 = tweenPoints[i][0];
             tweener.point2 = tweenPoints[i][1];
         }
