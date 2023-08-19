@@ -92,7 +92,7 @@ Copy the following code into your `index.js` file:
     import MyLevel3 from './MyLevel3';
 
     /**
-     *  Setup Psyanim and PsyanimJsPsychPlugin
+     *  Setup Psyanim
      */
     PsyanimApp.Instance.config.registerScene(MyLevel1);
     PsyanimApp.Instance.config.registerScene(MyLevel2);
