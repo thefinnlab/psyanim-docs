@@ -16,4 +16,10 @@ These are a bit longer, but should give you a solid foundation to build interact
 
 ---
 
+Checkout the [Psyanim API docs](https://github.com/thefinnlab/psyanim-api-docs) repo and serve them up locally while you develop so you can see all the existing prefabs and components at a glance instead of checking out the whole Psyanim 2.0 repo.
+
+You can also always look at the API docs in the [Psyanim 2.0](https://github.com/thefinnlab/psyanim-2) repo itself.
+
+---
+
 For more advanced examples, including how to use Psyanim 2.0 Core components, check out the [test scenes](https://github.com/thefinnlab/psyanim-2/tree/master/test/scenes) in the [Psyanim 2.0](https://github.com/thefinnlab/psyanim-2/tree/master) repo, as well as the [Psyanim Examples](https://github.com/thefinnlab/psyanim-examples) repo.
