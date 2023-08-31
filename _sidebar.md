@@ -4,7 +4,11 @@
 ---
 Quick Start
 * [Hello Psyanim 2.0](/hello_psyanim_2.md "Hello Psyanim 2.0")
+* [Entities and Components](/quick_start_entities_and_components.md "Entities and Components")
+* [Entity Prefabs](/quick_start_entity_prefabs.md "Entity Prefabs")
+* [AI Steering Behaviors](/quick_start_ai_steering_behaviors.md "AI Steering Behaviors")
 ---
+
 Psyanim In-Depth
 * [Scenes and Entities](/scenes_and_entities.md "Scenes and Entities")
 * [Entities and Components](/entities_and_components.md "Entities and Components")
