@@ -1,4 +1,4 @@
-# Entity Prefabs
+# <ins>Psyanim In-Depth: Entity Prefabs</ins>
 
 ## 1. What's an `Entity Prefab`?
 

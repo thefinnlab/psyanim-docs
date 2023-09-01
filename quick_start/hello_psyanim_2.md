@@ -1,4 +1,4 @@
-# Getting started quickly with Psyanim 2.0
+# <ins>Getting started quickly with Psyanim 2.0</ins>
 
 Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2-tutorial).
 

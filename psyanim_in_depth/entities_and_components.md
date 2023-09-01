@@ -1,4 +1,4 @@
-# Entities and Components
+# <ins>Psyanim In-Depth: Entities and Components</ins>
 
 Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim-components-tutorial).
 

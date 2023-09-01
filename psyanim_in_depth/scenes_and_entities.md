@@ -1,16 +1,14 @@
-# Scenes and Entities
+# <ins>Psyanim In-Depth: Scenes and Entities</ins>
 
 Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim-scenes-tutorial).
 
-## 1. The Psyanim Scene and Psyanim Entity
+## 1. Overview
 
-A `Psyanim Scene` is an abstraction for the 2D world we are simulating.
+Psyanim 2.0 Scenes can be defined using a `declarative syntax`, as we've seen in the `Quick Start` tutorials.
 
-A `Psyanim Entity` is an abstraction for anything that exists in a Psyanim Scene with a particular location, rotation, and (optionally) a visual representation which can have physics applied to it.
+However, there may be times, especially when prototyping new component functionality, where it'd be beneficial to have greater flexibility and control over the main game loop of the scene, adding imperative code where we see fit.
 
-The `PsyanimScene` class acts as a container for `PsyanimEntity` objects.
-
-Any object in your simulation that needs a position or orientation in the scene, a visual representation in the scene, or needs to have physics applied to it should be added to the scene as an entity.
+In this tutorial, we'll look at how we can create a `scene` in `Psyanim 2.0` by implementing a class which inherits from `PsyanimScene`
 
 To build a more intuitive feel for this, let's build a player controller from the ground up - we'll create a scene with an entity we can control via the keyboard.
 

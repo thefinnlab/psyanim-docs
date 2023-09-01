@@ -1,24 +1,14 @@
 # Psyanim 2.0 - Introduction and Overview
 
-Psyanim 2.0 is a tool for rapid design, prototyping and deployment of psychology research experiments involving 2D procedural animation.
+`Psyanim 2.0` is a tool for rapid design, prototyping and deployment of psychology research experiments involving 2D procedural game AI & animation.
 
----
+In order to create experiments with different `Psyanim` scenes and agent behaviors, a basic understanding of Javascript is recommended, but not beyond what is required to use [jsPsych](https://www.jspsych.org/).
 
-For a quick intro to Psyanim 2.0, check out our [Hello Psyanim 2.0](/hello_psyanim_2.md) tutorial!
+To extend Psyanim with new functionality or AI behavior algorithms, an intermediate level of comfort with Javascript is recommended.
 
-The [Hello Psyanim 2.0](/hello_psyanim_2.md) tutorial is designed to get you familiar with the core concepts in Psyanim 2.0, as well as Psyanim project structures and using the Psyanim-CLI to manage creation of projects, scenes and components.
+The `Quick Start` tutorials will get you up and running with a basic Javascript background.
 
----
-
-For a deeper understanding of creating interactive, animated content in Psyanim 2.0, check out the [Scenes and Entities](/scenes_and_entities.md) and [Entities and Components](/entities_and_components.md) tutorials.
-
-These are a bit longer, but should give you a solid foundation to build interactive content in Psyanim 2.0.
-
----
-
-Checkout the [Psyanim API docs](https://github.com/thefinnlab/psyanim-api-docs) repo and serve them up locally while you develop so you can see all the existing prefabs and components at a glance instead of checking out the whole Psyanim 2.0 repo.
-
-You can also always look at the API docs in the [Psyanim 2.0](https://github.com/thefinnlab/psyanim-2) repo itself.
+The `Psyanim In-Depth` tutorials are only necessary if you plan on extending Psyanim with new functionality or AI behavior algorithms.
 
 ---
 
