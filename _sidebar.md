@@ -8,6 +8,7 @@ Quick Start
 * [Entities and Components](/coming_soon.md "Entities and Components")
 * [Entity Prefabs](/coming_soon.md "Entity Prefabs")
 * [AI Steering Behaviors](/coming_soon.md "AI Steering Behaviors")
+* [JsPsych Integration](/coming_soon.md "JsPsych Integration")
 * [Experiment Recording and Playback](/coming_soon.md "Experiment Recording and Playback")
 ---
 Psyanim In-Depth
