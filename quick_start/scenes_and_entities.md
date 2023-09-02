@@ -243,4 +243,106 @@ Great work - if you reload your experiment in the browser and navigate to the tr
 
 ## 4. Adding an AI-controlled entity to our scene
 
-**TODO:**
+Now all we need to do is add an `AI-controlled entity` to our scene.  We often refer to AI-controlled entities as `agents`.
+
+Let's start by adding a second `entity` definition to our `scene definition`'s `entities` array with the following `initialPosition` and `shapeParams`:
+
+```js
+export default {
+    key: 'InteractiveEvadeAgent',
+    entities: [
+        {
+            name: 'player',
+            initialPosition: { x: 400, y: 300 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE,
+                radius: 12,
+                color: 0x0000ff
+            },
+            components: [
+                { type: PsyanimPlayerController }
+            ]
+        },
+        {
+            name: 'agent1',
+            initialPosition: { x: 600, y: 450 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE, 
+                base: 16, altitude: 32, color: 0x00ff00         
+            }
+        },
+    ]
+};
+```
+
+This `agent` has a green triangle shape and we place it in the lower-left quadrant of the `scene canvas`.
+
+Adding an `evade behavior` to an `agent` involves adding 4 different components to it and configuring each one of them properly: 
+
+`PsyanimVehicle`, `PsyanimFleeBehavior`, `PsyanimEvadeBehavior`, and `PsyanimEvadeAgent`
+
+While this might not be a large number of components, you'd have to be familiar with each one individually and understand how to use them together.
+
+Lucky for us, there's an easier way to add all the necessary components and configure them all properly: `Entity Prefabs`!
+
+`Entity Prefabs` are like a blueprint for creating a certain type of agent, one with potentially complex behaviors produced by combining different components together in various ways.
+
+Don't worry too much about all the details for now, but just know that, for a given behavior, an `Entity Prefab` will add all the necessary components to an agent for you and configure them properly.
+
+The `prefab` should also expose only the necessary configuration parameters you will need to care about, making configuration as simple as possible.
+
+To get our `agent` behaving like a `PsyanimEvadeAgent`, let's add the `PsyanimEvadeAgentPrefab` to our new entity definition like so:
+
+```js
+...
+        {
+            name: 'agent1',
+            initialPosition: { x: 600, y: 450 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE, 
+                base: 16, altitude: 32, color: 0x00ff00         
+            },
+            prefab: { type: PsyanimEvadeAgentPrefab },
+        }
+...
+```
+
+The `PsyanimEvadeAgentPrefab` adds a `PsyanimEvadeAgent` `component` to our `entity`, which requires that we specify a target for our `agent` to evade.
+
+To do this, we can use the `components` array of our `entity definition` to specify another entity in the scene as the `evade agent`'s target, referencing it's by name as follows:
+
+```js
+        {
+            name: 'agent1',
+            initialPosition: { x: 600, y: 450 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE, 
+                base: 16, altitude: 32, color: 0x00ff00         
+            },
+            prefab: { type: PsyanimEvadeAgentPrefab },
+            components: [
+                {
+                    type: PsyanimEvadeAgent,
+                    params: {
+                        target: {
+                            entityName: 'player'
+                        }
+                    }
+                }
+            ]
+        }
+```
+
+Here, we set the `target` parameter of the `PsyanimEvadeAgent` component to the `player` entity.
+
+Don't worry too much about `prefabs` and `components` for now, we'll explore them in more detail in the next tutorials.
+
+At this point, your code should look like [this](https://github.com/thefinnlab/hello-psyanim2-tutorial/blob/master/src/InteractiveEvadeAgent.js).
+
+---
+
+Go ahead and reload your experiment in the browser and you should see your blue, circle-shaped `player` entity and the green, triangle-shaped `evade agent` we just created.
+
+When you try to approach the `evade agent` using the WASD keys on your keyboard, the `agent` should move away from where it predicts you're headed.
+
+Great work - you've just setup an interactive scene for your experiment with a keyboard-controlled `player` entity and an `AI agent` that evades the player!
