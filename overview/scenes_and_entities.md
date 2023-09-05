@@ -1,4 +1,4 @@
-# Quick Start: Scenes and Entities
+# Psyanim 2.0: Scenes and Entities
 
 ## 1. The Psyanim Scene and Psyanim Entity
 
@@ -14,7 +14,7 @@ To get a more hands-on feel for this, let's put together a simple scene where th
 
 ## 2. Project and scene setup
 
-For this tutorial, we will continue where we left off in the previous [`Hello Psyanim 2.0`](/quick_start/hello_psyanim_2.md) tutorial.
+For this tutorial, we will continue where we left off in the previous [`Hello Psyanim 2.0`](/overview/hello_psyanim_2.md) tutorial.
 
 Let's go ahead and delete `EmptyScene.js` under the `./src` directory and open `index.js`.
 

@@ -304,4 +304,4 @@ In this tutorial, we learned about how to create scenes with entities in Psyanim
 
 While writing custom components can give you full control over an entity's state & behavior, it may not be necessary, depending on the needs of your experiment.
 
-Psyanim 2.0 comes with several components for player control and AI steering behaviors, so head over to the [next tutorial](/quick_start_entities_and_components.md) to see how to leverage them for your experiments.
+Psyanim 2.0 comes with several components for player control and AI steering behaviors, so head over to the [next tutorial](/overview/entities_and_components.md) to see how to leverage them for your experiments.

@@ -1,4 +1,4 @@
-# Quick Start: Entities and Components
+# Psyanim 2.0: Entities and Components
 
 You can check out the full scene definition for this tutorial [here](https://github.com/thefinnlab/hello-psyanim2-tutorial/blob/master/src/MyArriveScene.js).
 

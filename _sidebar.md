@@ -3,10 +3,12 @@
 * [Home](/ "Psyanim 2.0")
 ---
 Quick Start
-* [Hello Psyanim 2.0](/quick_start/hello_psyanim_2.md "Hello Psyanim 2.0")
-* [Scenes and Entities](/quick_start/scenes_and_entities.md "Scenes and Entities")
-* [Entities and Components](/quick_start/entities_and_components.md "Entities and Components")
-* [Entity Prefabs](/quick_start/entity_prefabs.md "Entity Prefabs")
+* [Hello Psyanim 2.0](/overview/hello_psyanim_2.md "Hello Psyanim 2.0")
+---
+Psyanim Overview
+* [Scenes and Entities](/overview/scenes_and_entities.md "Scenes and Entities")
+* [Entities and Components](/overview/entities_and_components.md "Entities and Components")
+* [Entity Prefabs](/overview/entity_prefabs.md "Entity Prefabs")
 * [AI Steering Behaviors](/coming_soon.md "AI Steering Behaviors")
 * [JsPsych Integration](/coming_soon.md "JsPsych Integration")
 * [Experiment Recording and Playback](/coming_soon.md "Experiment Recording and Playback")

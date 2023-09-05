@@ -1,4 +1,4 @@
-# Quick Start - Entity Prefabs
+# Psyanim 2.0: Entity Prefabs
 
 You can check out the full scene definition for this tutorial [here](TODO).
 
@@ -30,7 +30,7 @@ The `Entity Prefab` encapsulates one or more `components` necessary to create an
 
 ## 2. Rebuilding our `MyArriveAgent` scene with prefabs
 
-To see this `Entity Prefab` concept in action and better understand it's purpose, let's rebuild the `MyArriveAgent` scene again (from previous [tutorial](/quick_start/entities_and_components.md)), but this time using `prefabs` instead of adding / configuring every single component manually.
+To see this `Entity Prefab` concept in action and better understand it's purpose, let's rebuild the `MyArriveAgent` scene again (from previous [tutorial](/overview/entities_and_components.md)), but this time using `prefabs` instead of adding / configuring every single component manually.
 
 Remember that this is a smaller, simpler contrived example, and some prefabs, such as the `Playfight Agent Prefab` or the `Predator/Prey Agent Prefabs` will be even more complex, thus the `prefab` is even more helpful there.
 
