@@ -32,8 +32,6 @@ Then, remove the following lines where we create the `emptySceneTrial` object in
 let emptySceneTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: EmptyScene.key,
-    experimentName: experimentName,
-    userID: userID,
     sceneParameters: { },
 };
 
@@ -108,8 +106,6 @@ Now it's time to create a `jsPsych` trial that uses this Psyanim `scene definiti
 let interactiveEvadeAgentTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: InteractiveEvadeAgent.key,
-    experimentName: experimentName,
-    userID: userID,
     sceneParameters: { }
 };
 ```

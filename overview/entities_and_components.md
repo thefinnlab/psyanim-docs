@@ -35,8 +35,6 @@ import MyArriveScene from './MyArriveScene';
 let arriveSceneTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: MyArriveScene.key,
-    experimentName: experimentName,
-    userID: userID,
     sceneParameters: { }
 };
 ...

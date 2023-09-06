@@ -116,8 +116,6 @@ Next, let's declare a trial `myfirstSceneTrial` after the `emptySceneTrial` is d
 let myFirstSceneTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: MyFirstScene.key,
-    experimentName: experimentName,
-    userID: userID,
     sceneParameters: { }
 };
 ```
@@ -135,15 +133,27 @@ import { initJsPsych } from 'jspsych';
 
 import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 
-import { PsyanimApp, PsyanimJsPsychPlugin } from 'psyanim2';
+import { 
+    PsyanimApp, 
+    PsyanimJsPsychPlugin,
+    PsyanimFirebaseClient
 
-import EmptyScene from './EmptyScene';
+} from 'psyanim2';
+
 import MyFirstScene from './MyFirstScene';
 
+// import firebaseJsonConfig from '../firebase.config.json';
+
 /**
-*  Setup Psyanim and PsyanimJsPsychPlugin
-*/
-PsyanimApp.Instance.config.registerScene(EmptyScene);
+ *  Handle user authentication and setup any other configuration
+ */
+
+const userID = 'Jason';
+const experimentName = 'defaultExperimentName';
+
+/**
+ *  Setup Psyanim App
+ */
 PsyanimApp.Instance.config.registerScene(MyFirstScene);
 
 PsyanimApp.Instance.run();
@@ -151,11 +161,17 @@ PsyanimApp.Instance.run();
 PsyanimApp.Instance.setCanvasVisible(false);
 
 /**
+ *  Setup PsyanimJsPsychPlugin
+ */
+PsyanimJsPsychPlugin.setUserID(userID);
+PsyanimJsPsychPlugin.setExperimentName(experimentName);
+
+// const firebaseClient = new PsyanimFirebaseClient(firebaseJsonConfig);
+// PsyanimJsPsychPlugin.setDocumentWriter(firebaseClient);
+
+/**
 *  Setup jsPsych experiment
 */
-
-const userID = 'Jason';
-const experimentName = 'defaultExperimentName';
 
 const jsPsych = initJsPsych();
 
@@ -167,16 +183,12 @@ let welcome = {
 let emptySceneTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: EmptyScene.key,
-    experimentName: experimentName,
-    userID: userID,
     sceneParameters: { },
 };
 
 let myFirstSceneTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: MyFirstScene.key,
-    experimentName: experimentName,
-    userID: userID,
     sceneParameters: { }
 };
 
