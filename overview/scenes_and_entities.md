@@ -1,5 +1,7 @@
 # Psyanim 2.0: Scenes and Entities
 
+Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/psyanim-overview-tutorials/tree/scenes-and-entities).
+
 ## 1. The Psyanim Scene and Psyanim Entity
 
 A `Psyanim Scene` is an abstraction for the 2D world we are simulating.
@@ -32,7 +34,6 @@ Then, remove the following lines where we create the `emptySceneTrial` object in
 let emptySceneTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: EmptyScene.key,
-    sceneParameters: { },
 };
 
 ...
@@ -106,7 +107,6 @@ Now it's time to create a `jsPsych` trial that uses this Psyanim `scene definiti
 let interactiveEvadeAgentTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: InteractiveEvadeAgent.key,
-    sceneParameters: { }
 };
 ```
 

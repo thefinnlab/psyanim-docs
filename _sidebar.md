@@ -9,9 +9,9 @@ Psyanim Overview
 * [Scenes and Entities](/overview/scenes_and_entities.md "Scenes and Entities")
 * [Entities and Components](/overview/entities_and_components.md "Entities and Components")
 * [Entity Prefabs](/overview/entity_prefabs.md "Entity Prefabs")
-* [AI Steering Behaviors](/coming_soon.md "AI Steering Behaviors")
-* [JsPsych Integration](/coming_soon.md "JsPsych Integration")
+* [JsPsych Integration](/overview/jspsych_integration.md "JsPsych Integration")
 * [Experiment Recording and Playback](/coming_soon.md "Experiment Recording and Playback")
+* [AI Steering Architecture](/coming_soon.md "AI Steering Architecture")
 ---
 Psyanim In-Depth
 * [Entities and Components](/coming_soon.md "Entities and Components")

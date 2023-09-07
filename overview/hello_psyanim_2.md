@@ -1,6 +1,6 @@
 # <ins>Getting started quickly with Psyanim 2.0</ins>
 
-Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2-tutorial).
+Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/psyanim-overview-tutorials/tree/hello-psyanim2).
 
 ## 1. Core concepts
 
@@ -116,7 +116,6 @@ Next, let's declare a trial `myfirstSceneTrial` after the `emptySceneTrial` is d
 let myFirstSceneTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: MyFirstScene.key,
-    sceneParameters: { }
 };
 ```
 
@@ -126,79 +125,7 @@ Now let's add this new trial we defined to the line with `jspsych.run()`, by rep
 jsPsych.run([welcome, emptySceneTrial, myFirstSceneTrial, goodbye]);
 ```
 
-**After these modifications, your `index.js` should look like the following:**
-
-```js
-import { initJsPsych } from 'jspsych';
-
-import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
-
-import { 
-    PsyanimApp, 
-    PsyanimJsPsychPlugin,
-    PsyanimFirebaseClient
-
-} from 'psyanim2';
-
-import MyFirstScene from './MyFirstScene';
-
-// import firebaseJsonConfig from '../firebase.config.json';
-
-/**
- *  Handle user authentication and setup any other configuration
- */
-
-const userID = 'Jason';
-const experimentName = 'defaultExperimentName';
-
-/**
- *  Setup Psyanim App
- */
-PsyanimApp.Instance.config.registerScene(MyFirstScene);
-
-PsyanimApp.Instance.run();
-
-PsyanimApp.Instance.setCanvasVisible(false);
-
-/**
- *  Setup PsyanimJsPsychPlugin
- */
-PsyanimJsPsychPlugin.setUserID(userID);
-PsyanimJsPsychPlugin.setExperimentName(experimentName);
-
-// const firebaseClient = new PsyanimFirebaseClient(firebaseJsonConfig);
-// PsyanimJsPsychPlugin.setDocumentWriter(firebaseClient);
-
-/**
-*  Setup jsPsych experiment
-*/
-
-const jsPsych = initJsPsych();
-
-let welcome = {
-    type: htmlKeyboardResponse,
-    stimulus: 'Welcome to the experiment.  Press any key to begin.'
-};
-
-let emptySceneTrial = {
-    type: PsyanimJsPsychPlugin,
-    sceneKey: EmptyScene.key,
-    sceneParameters: { },
-};
-
-let myFirstSceneTrial = {
-    type: PsyanimJsPsychPlugin,
-    sceneKey: MyFirstScene.key,
-    sceneParameters: { }
-};
-
-let goodbye = {
-    type: htmlKeyboardResponse,
-    stimulus: 'Congrats - you have completed your first experiment!  Press any key to end this trial.'
-};
-
-jsPsych.run([welcome, emptySceneTrial, myFirstSceneTrial, goodbye]);
-```
+**After these modifications, your `index.js` should look like [this](https://github.com/thefinnlab/psyanim-overview-tutorials/blob/hello-psyanim2/src/index.js).**
 
 Run `npm run build` in your terminal and then look in the ./dist directory to see your index.html.  Load this in your browser using whatever static file server you prefer.
 
@@ -316,4 +243,4 @@ In this tutorial, we learned about how to create scenes with entities in Psyanim
 
 While writing custom components can give you full control over an entity's state & behavior, it may not be necessary, depending on the needs of your experiment.
 
-Psyanim 2.0 comes with several components for player control and AI steering behaviors, so head over to the [next tutorial](/overview/entities_and_components.md) to see how to leverage them for your experiments.
+Psyanim 2.0 comes with several components for player control and AI steering behaviors, so head over to the [next tutorial](/overview/scenes_and_entities.md) to see how to leverage them for your experiments.

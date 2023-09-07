@@ -1,6 +1,6 @@
 # Psyanim 2.0: Entity Prefabs
 
-You can check out the full scene definition for this tutorial [here](TODO).
+Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/psyanim-overview-tutorials/tree/entity-prefabs).
 
 ## 1. Introduction to `Entity Prefabs`
 

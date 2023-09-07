@@ -1,6 +1,6 @@
 # Psyanim 2.0: Entities and Components
 
-You can check out the full scene definition for this tutorial [here](https://github.com/thefinnlab/hello-psyanim2-tutorial/blob/master/src/MyArriveScene.js).
+Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/psyanim-overview-tutorials/tree/entities-and-components).
 
 ## 1. A deeper dive into `entities` and `components`
 
@@ -32,10 +32,11 @@ Next, let's open up our index.js and add this scene to a jsPsych trial by adding
 ...
 import MyArriveScene from './MyArriveScene';
 ...
+PsyanimApp.Instance.config.registerScene(MyArriveScene);
+...
 let arriveSceneTrial = {
     type: PsyanimJsPsychPlugin,
     sceneKey: MyArriveScene.key,
-    sceneParameters: { }
 };
 ...
 ```
@@ -123,7 +124,7 @@ The next step is adding a `PsyanimMouseFollowTarget` component to the `component
             components: [
                 { type: PsyanimMouseFollowTarget }
             ]
-        }
+        },
 ...
 ```
 
