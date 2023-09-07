@@ -333,7 +333,7 @@ Here, we set the `target` parameter of the `PsyanimEvadeAgent` component to the 
 
 Don't worry too much about `prefabs` and `components` for now, we'll explore them in more detail in the next tutorials.
 
-At this point, your code should look like [this](https://github.com/thefinnlab/hello-psyanim2-tutorial/blob/master/src/InteractiveEvadeAgent.js).
+At this point, your code should look like [this](https://github.com/thefinnlab/psyanim-overview-tutorials/blob/scenes-and-entities/src/InteractiveEvadeAgent.js).
 
 ---
 
