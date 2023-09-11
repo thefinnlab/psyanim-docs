@@ -184,3 +184,229 @@ Note that we use `PsyanimUtils.cloneSceneDefinition()` to create a copy of our `
 We must use this utility function to create copies of `scene definitions` because we want a *deep-copy* that we can modify without affecting the others.
 
 And that's all there is to it!  Great work - you've just created multiple `jsPsych trials` as variations of the same `Psyanim scene definition`!
+
+## 6. Trial end conditions
+
+`Psyanim 2.0` provides 3 types of conditions upon which a trial will end:
+
+- `Duration-based`
+- `Key Press`
+- `Player Contact`
+
+The `duration-based` `trial end condition` uses a configurable timeout.  Once the configured time expires from trial start, the jsPsych trial ends.
+
+We can also configure the trial to end when any keyboard key is pressed.
+
+We can also setup the trial to end when the `player's entity` contacts another entity in the scene.
+
+Finally, we can employ any or all of these trial end conditions together.
+
+When using multiple trial-end conditions together, whichever condition is met first will trigger the end of the trial.
+
+The following sections will explore how to use these `trial end conditions` in practice.
+
+## 7. Ending trials by key press and duration
+
+To see how to use the `duration-based` and `key press` trial end conditions, let's open up our index.js and update our `Wander Agent` scenes to use them.
+
+The first thing we'll do is declare an array of `trialDurations` containing the `duration parameter`, in milliseconds, for each of our 3 `Wander Agent` trials.
+
+Add the following line right before the line where we declare the `trialInstances` array:
+
+```js
+let trialDurations = [ 5000, 10000, 15000 ];
+```
+
+Next, in the `for-loop` where we push each `Wander Agent` trial definition into our `timeline` array, update the `trial definition` to include the `duration` and `endTrialKeys` parameters:
+
+```js
+    // add it to the jsPsych timeline!
+    timeline.push({
+        type: PsyanimJsPsychPlugin,
+        sceneKey: trialScene.key,
+        duration: trialDurations[i],
+        endTrialKeys: [' ', 'enter', 'h']
+    });
+```
+
+Recall that there are 3 `Wander Agent` trials.  Here we are setting the `duration` parameter for each one to 5000, 10000, and 15000 milleconds, respectively.
+
+We also add an `endTrialKeys` parameter which ends the trial if any of the following keys are pressed:
+
+- Space-Bar
+- Enter Key
+- Lowercase 'h' key
+
+These 3 `Wander Agents` trials will end when either of these conditions are met (duration time elapses or any of the configured keys are pressed).
+
+By this point, the code in your `index.js` should look like [this](https://github.com/thefinnlab/psyanim-overview-tutorials/blob/master/src/index.js).
+
+Reload your experiment in your browser to see this in action!
+
+## 8. Ending trials based on player contact
+
+To see how to use the `Player contact` trial end condition, let's modify our `InteractiveEvadeAgent.js` scene definition, adding some walls and making contact with certain entities end the trial.
+
+Open the scene definition file and add the `PsyanimSensor` and `PsyanimJsPsychPlayerContactListener` components to your `psyanim2` imports as follows:
+
+```js
+import 
+{ 
+    PsyanimConstants,
+    PsyanimPlayerController,
+    PsyanimEvadeAgentPrefab,
+    PsyanimEvadeAgent,
+    PsyanimSensor,
+    PsyanimJsPsychPlayerContactListener
+    
+} from 'psyanim2';
+```
+
+Next, let's add 4 wall boundaries at the `north`, `south`, `east` and `west` sides of our world by adding the following entity definitions to our `entities` array:
+
+```js
+...
+        {
+            name: 'northWall',
+            initialPosition: { x: 400, y: 15 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.RECTANGLE,
+                width: 720, height: 30, color: 0xff0000
+            },
+            matterOptions: {
+                isStatic: true,
+            }
+        },
+        {
+            name: 'southWall',
+            initialPosition: { x: 400, y: 585 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.RECTANGLE,
+                width: 720, height: 30, color: 0xff0000
+            },
+            matterOptions: {
+                isStatic: true,
+            }
+        },
+        {
+            name: 'westWall',
+            initialPosition: { x: 20, y: 300 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.RECTANGLE,
+                width: 40, height: 600, color: 0x00ff00
+            },
+            matterOptions: {
+                isStatic: true,
+            }
+        },
+        {
+            name: 'eastWall',
+            initialPosition: { x: 780, y: 300 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.RECTANGLE,
+                width: 40, height: 600, color: 0x00ff00
+            },
+            matterOptions: {
+                isStatic: true,
+            }
+        },
+...
+```
+
+These wall boundaries are `red` and `green` colored.  We want to setup the scene so the trial ends if the player touches the `red` walls or the `evade agent`.
+
+To accomplish this, we simply need to add a `PsyanimSensor` and a `PsyanimJsPsychPlayerContactListener` to our `player` agent as follows:
+
+```js
+        {
+            name: 'player',
+            initialPosition: { x: 400, y: 300 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE,
+                radius: 12,
+                color: 0x0000ff
+            },
+            components: [
+                { 
+                    type: PsyanimPlayerController,
+                    params: {
+                        speed: 12
+                    }
+                },
+                {
+                    type: PsyanimSensor,
+                    params: {
+                        bodyShapeParams: {
+                            radius: 18,
+                            shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE
+                        }
+                    }
+                },
+                {
+                    type: PsyanimJsPsychPlayerContactListener,
+                    params: {
+                        sensor: {
+                            entityName: 'player',
+                            componentType: PsyanimSensor
+                        },
+                        targetEntityNames: [ 
+                            "agent1",
+                            "northWall",
+                            "southWall"
+                        ]
+                    }
+                }
+            ]
+        },
+```
+
+The `PsyanimSensor` component's params just specify the size and shape of the sensor.  Here, we make it a `circle` shape of `radius` '18'.
+
+In order for the `PsyanimJsPsychPlugin` to be notified when a player agent in a `scene` makes contact with something that should end the `jsPsych trial`, we need to add a `PsyanimJsPsychPlayerContactListener` to any entity in the scene.
+
+For convenience, we can just add the `PsyanimJsPsychPlayerContactListener` component to our `player` entity as shown in the previous code snippet.
+
+The only two parameters we need to configure for this component are the `sensor` reference and the `targetEntityNames`.
+
+The `sensor` reference is simply a reference to the sensor that we want to listen for collision events from, which is the `PsyanimSensor` component of our `player` agent.
+
+The `targetEntityNames` parameter expects a list of `entity` names for which colliding them would cause the `jsPsych trial` to end.
+
+Notice that we've increased the `PsyanimPlayerController` component's `speed` parameter to `12` also.  This will give us the opportunity to 'catch' the `evade agent` as it tries to escape from the `player` entity.
+
+To make the 'chase' a little easier, let's also slow down the `evade agent` by reducing the `maxSpeed` parameter of `agent1`'s `PsyanimEvadeAgentPrefab` as follows:
+
+```js
+        {
+            name: 'agent1',
+            initialPosition: { x: 600, y: 450 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE, 
+                base: 16, altitude: 32, color: 0xff0000
+            },
+            prefab: { 
+                type: PsyanimEvadeAgentPrefab,
+                params: {
+                    maxSpeed: 3,
+                }
+            },
+            components: [
+                {
+                    type: PsyanimEvadeAgent,
+                    params: {
+                        target: {
+                            entityName: 'player'
+                        }
+                    }
+                }
+            ]
+        }
+```
+
+By this point, your `InteractiveEvadeAgent.js` file should look like [this](https://github.com/thefinnlab/psyanim-overview-tutorials/blob/master/src/InteractiveEvadeAgent.js).
+
+Reload your browser to see this in action!
+
+This wraps up our discussion of the `trial end conditions` in the `PsyanimJsPsychPlugin`.
+
+However, note that by writing custom `PsyanimComponents`, it is possible to create other custom `trial end conditions`.  The possibilities in are endless!
