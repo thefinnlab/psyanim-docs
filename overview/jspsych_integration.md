@@ -17,7 +17,7 @@ This tutorial picks up where the previous tutorial, `Entity Prefabs`, leaves off
 Let's create our `JsPsychIntegrationScene` by running the following command in the terminal:
 
 ```bash
-npx psyanim-cli -s JsPsychIntegrationScene.js
+npx psyanim-cli -s JsPsychIntegrationScene
 ```
 
 Go ahead and open up `JsPsychIntegrationScene.js` in you `/src` directory and replace it's contents with the following:
@@ -207,17 +207,17 @@ The following sections will explore how to use these `trial end conditions` in p
 
 ## 7. Ending trials by key press and duration
 
-To see how to use the `duration-based` and `key press` trial end conditions, let's open up our index.js and update our `Wander Agent` scenes to use them.
+To see how to use the `duration-based` and `key press` trial end conditions, let's open up our index.js and peek at how our `Wander Agent` scenes use them.
 
-The first thing we'll do is declare an array of `trialDurations` containing the `duration parameter`, in milliseconds, for each of our 3 `Wander Agent` trials.
+The first thing we'll see is an array of `trialDurations` containing the `duration parameter`, in milliseconds, for each of our 3 `Wander Agent` trials.
 
-Add the following line right before the line where we declare the `trialInstances` array:
+We see the following line right before the line where we declare the `trialInstances` array:
 
 ```js
 let trialDurations = [ 5000, 10000, 15000 ];
 ```
 
-Next, in the `for-loop` where we push each `Wander Agent` trial definition into our `timeline` array, update the `trial definition` to include the `duration` and `endTrialKeys` parameters:
+Next, in the `for-loop` where we push each `Wander Agent` trial definition into our `timeline` array, we see the `trial definition` includes the `duration` and `endTrialKeys` parameters:
 
 ```js
     // add it to the jsPsych timeline!
@@ -239,7 +239,7 @@ We also add an `endTrialKeys` parameter which ends the trial if any of the follo
 
 These 3 `Wander Agents` trials will end when either of these conditions are met (duration time elapses or any of the configured keys are pressed).
 
-By this point, the code in your `index.js` should look like [this](https://github.com/thefinnlab/psyanim-overview-tutorials/blob/master/src/index.js).
+By this point, the code in your `index.js` should look like [this](https://github.com/thefinnlab/psyanim-overview-tutorials/blob/jspsych-integration/src/index.js).
 
 Reload your experiment in your browser to see this in action!
 
