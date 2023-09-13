@@ -17,7 +17,10 @@ Psyanim In-Depth
 * [Entities and Components](/coming_soon.md "Entities and Components")
 * [Entity Prefabs](/coming_soon.md "Entity Prefabs")
 ---
-Psyanim Core Components
+Full Example Experiments
+* [Predator-Prey](/example_experiments/predator_prey.md "Predator-Prey Experiment")
+---
+Psyanim Core Examples
 * [Start Here](/psyanim_core_examples/start_here.md "Psyanim Core Usage Examples")
 * [Interactive Predator](/coming_soon.md "Interactive Predator Example")
 ---
