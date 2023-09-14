@@ -247,6 +247,18 @@ Reload your experiment in your browser to see this in action!
 
 To see how to use the `Player contact` trial end condition, let's modify our `InteractiveEvadeAgent.js` scene definition, adding some walls and making contact with certain entities end the trial.
 
+Before we do that, if you look in your `index.js`, you should see that `endTrialOnContact` is set to `true` for the `InteractiveEvadeAgent` trial definition.
+
+This flag in the `trial definition` is used to control whether or not the trial will end on player contact with any configured entities in the scene.
+
+It can, optionally, be used in conjunction with the `duration` and `key press` trial end conditions.
+
+In order for this to work, we'll need to make sure there's a `PsyanimJsPsychPlayerContactListener` in the scene and that the `player entity` has a `PsyanimSensor` attached to it.
+
+The `PsyanimJsPsychPlayerContactListener` component notifies the `PsyanimJsPsychPlugin` when player contact has occured in the scene with an entity of interest.
+
+The `PsyanimSensor` we attach to the player encapsulates the actual `matter-js` physics body that is used for `collision detection` in our `scene`, and thus must remain attached to the player entity, so it will share the same position and rotation in the world.
+
 Open the scene definition file and add the `PsyanimSensor` and `PsyanimJsPsychPlayerContactListener` components to your `psyanim2` imports as follows:
 
 ```js
