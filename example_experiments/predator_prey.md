@@ -242,3 +242,148 @@ Note that the scene definitions are just Javascript objects, and thus, when we c
 To modify simulation parameters for each trial, all we need to do is modify the javascript object, whose structure is that of a `Psyanim scene definition`.
 
 **Congrats - you've built a predator-prey experiment where the predator's `subtlety` parameter is takes on different values in each trial, and the predator agent is sometimes on the left or right, but color is always fixed by starting location.**
+
+## 4. Setting up `Mimic` trials with multiple parameter variations.
+
+Let's setup some predator-prey `Mimic` trials, where the predator doesn't chase the prey directly, rather it chases an entity that is 'mimicking' the prey's behavior.
+
+To do this, we will setup a predator-prey scene, same as before.  However, this time, the prey will be made 'invisible' by making it the same color as the background.
+
+Moreover, we will add a third entity to the scene which is our `Mimic` entity.  This entity will 'Mimic' the movements of the prey, possibly offsetting it's position and orientation relative to the prey.
+
+To start, run the following command in terminal to create our `PredatorPreyMimic.js` scene definition file:
+
+```bash
+npx psyanim-cli -s PredatorPreyMimic
+```
+
+Open `PredatorPreyMimic.js` and copy the contents of `PredatorPrey.js` into it.  Remember, this `Mimic` scene is just a variation of the standard `Predator-Prey` scene, so we can safely use this as a starting point.
+
+In `PredatorPreyMimic.js`, rename the scene definition `key` field from `PredatorPrey` to `PredatorPreyMimic` and add `PsyanimMimic` to your `psyanim2` import statement at the top.
+
+In the `prey` entity's `shapeParams` field, change the `color` field to `0xffff00` and add a `depth` field with a value of `0` as follows:
+
+```js
+...
+        {
+            name: 'prey',
+            initialPosition: { x: 700, y: 500 },
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE,
+                radius: 12, color: 0xffff00, depth: 0
+            },
+            ...
+        }
+...
+```
+
+We've made the `prey` agent `yellow` colored so it doesn't have as much contrast with the background, but we can still see it for debugging purposes.  Note that we should change this to white to make it invisible before we deploy our experiment to production.
+
+The `depth` field changes the rendering order for the entity - if two entities overlap, the entity with the higher `depth` value in its `shapeParams` settings will be drawn on top.
+
+We want the `Mimic` entity to be drawn on top of the `prey`, so we will set the `prey` to a depth value of 0 for now.
+
+Now, let's add our third entity, the `Mimic` entity as follows to our `entities` array in our `scene definition`:
+
+```js
+...
+        {
+            name: 'preyMimic',
+            shapeParams: {
+                shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE,
+                radius: 12, color: 0x0000ff, depth: 1
+            },
+            matterOptions: {
+                isSensor: true
+            },
+            components: [
+                { 
+                    type: PsyanimMimic,
+                    params: {
+                        target: {
+                            entityName: 'prey',
+                        },
+                        xOffset: 0,
+                        yOffset: 0,
+                        angleOffset: 0
+                    }
+                }
+            ]
+        }
+...
+```
+
+As you can see here, all we hage to do to make this `preyMimic` entity mimic the `prey` entity is to add a `PreyMimic` component to it and set it's `target` parameter to reference the `prey` entity.
+
+Note that we made the `mimic` entity `blue` here, so it will stand out against the `white` canvas more than our `prey` and make it easier to observe.
+
+Moreover, we set the `depth` field of the `mimic` to a value of `1`, so it will always be rendered on top of the `prey` in cases where they overlap in the world.
+
+The `xOffset`, `yOffset` and `angleOffset` are optional, but essentially control the horizontal / vertical position offset and relative orientation of the `mimic` with respect to the `prey` as the prey moves forward/backward/left/right.
+
+Your final `PredatorPreyMimic.js` file should look like [this](https://github.com/thefinnlab/psyanim-core-examples/blob/predator-prey-experiment/src/PredatorPreyMimic.js).
+
+---
+
+To get a better feel for these parameters, we'll setup multiple `Mimic` trials using this scene and different parameters for each trial.
+
+Let's open up `index.js` and import the `PredatorPreyMimic` scene at the top of the file.
+
+Then, right after we setup our previous `Predator-Prey` trials, but before we push the `End trail` into our timeline, let's add the following code for our 3 `Mimic` trials:
+
+```js
+
+/**
+ *  Setup mimic scenes
+ */
+let nMimicTrials = 3;
+
+let mimicTrialParams = [
+    { xOffset: 0, yOffset: 0, angleOffset: 0 },
+    { xOffset: 30, yOffset: 30, angleOffset: 0 },
+    { xOffset: -300, yOffset: -200, angleOffset: 180 },
+];
+
+for (let i = 0; i < nMimicTrials; ++i)
+{
+    let trialScene = PsyanimUtils.cloneSceneDefinition(PredatorPreyMimic);
+
+    // update scene key to be unique
+    trialScene.key += '_' + i;
+
+    // register this new scene with psyanim app
+    PsyanimApp.Instance.config.registerScene(trialScene);
+
+    // let's update the scene params
+    let mimicEntity = trialScene.entities
+        .find(e => e.name === 'preyMimic');
+
+    let mimicComponent = mimicEntity.components[0];
+
+    mimicComponent.params.xOffset = mimicTrialParams[i].xOffset;
+    mimicComponent.params.yOffset = mimicTrialParams[i].yOffset;
+    mimicComponent.params.angleOffset = mimicTrialParams[i].angleOffset;
+
+    // add mimic scene to timeline
+    timeline.push({ 
+        type: PsyanimJsPsychPlugin,
+        sceneKey: trialScene.key,
+    });
+}
+```
+
+Here, we setup 3 `Mimic` trials, modifying the `xOffset`, `yOffset` and `angleOffset` parameters in each one.
+
+Recall we had to clone our `PredatorPreyMimic` scene, modifying it's `scene key` to make it unique and registering it with `PsyanimApp`.
+
+Then, we can modify this cloned scene's parameters without affecting the original.
+
+Once we've updated all the parameters for each trial, we push them into the timeline.
+
+The 3 parameter-sets we've chosen demonstrate the following cases, in order:
+
+- `Mimic` entity directly copying every single movement of the `prey` entity.
+- `Mimic` entity directly copying every single movement of the `prey` entity, but with it's position offset by `30 pixels` in the horizontal and vertical directions.
+- `Mimic` entity is copying the movements of the `prey` entity, but with both a `translational` and `rotational` offset together. (Note: a 180 degree `angleOffset` basically performs all the target entity's movements, but in the reverse direction)
+
+**Great work!  If you reload your experiment in the browser, you should see your 3 new trials in action!**
