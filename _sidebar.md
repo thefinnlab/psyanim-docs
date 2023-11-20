@@ -2,7 +2,7 @@
 
 * [Home](/ "Psyanim 2.0")
 ---
-Quick Start
+Getting Started
 * [Hello Psyanim 2.0](/overview/hello_psyanim_2.md "Hello Psyanim 2.0")
 ---
 Psyanim Overview
