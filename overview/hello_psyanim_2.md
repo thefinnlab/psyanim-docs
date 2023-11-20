@@ -185,6 +185,12 @@ export default {
 }
 ```
 
+To add an `entity` in the `scene definition` above, we add a single `entity definition` to our `entities` array called `agent1`.
+
+The `agent1` entity has a red circle representation in the scene and is centered at pixel coordinates `(400, 300)` in the scene.
+
+Notice we add our `MyFirstMovementComponent` to our `agent1` entity by adding a single object to its `components` array property.  The `type` field of the `component definition` object specifies the class type of the `component` we want to add.
+
 In a terminal, start a watch service to watch your code for changes with:
 
 ```bash
