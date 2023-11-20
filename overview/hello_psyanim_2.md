@@ -77,7 +77,7 @@ Let's get familiar with `Psyanim Scenes`, `Psyanim Entities` and `Psyanim Compon
 Back in the terminal, run the following command to create a scene named 'MyFirstScene':
 
 ```bash
-npx psyanim-cli -s MyFirstScene
+psyanim --scene MyFirstScene
 ```
 
 You should see `MyFirstScene.js` show up under `./src/`.
