@@ -51,7 +51,7 @@ npm install git+https://github.com/thefinnlab/psyanim-2.git
 Install psyanim-cli package globally from git repo via npm with:
 
 ```bash
-npm install git+https://github.com/thefinnlab/psyanim-cli.git
+npm install -g git+https://github.com/thefinnlab/psyanim-cli.git
 ```
 
 Create a new Psyanim-2 project with psyanim-cli by running the following command from the root of your project directory:
