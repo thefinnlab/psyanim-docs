@@ -2,10 +2,9 @@
 
 * [Home](/ "Psyanim 2.0")
 ---
-Getting Started
 * [Hello Psyanim 2.0](/overview/hello_psyanim_2.md "Hello Psyanim 2.0")
 ---
-Psyanim Overview
+<!-- Psyanim Overview
 * [Scenes and Entities](/overview/scenes_and_entities.md "Scenes and Entities")
 * [Entities and Components](/overview/entities_and_components.md "Entities and Components")
 * [Entity Prefabs](/overview/entity_prefabs.md "Entity Prefabs")
@@ -24,4 +23,4 @@ Psyanim Core Examples
 * [Start Here](/psyanim_core_examples/start_here.md "Psyanim Core Usage Examples")
 * [Interactive Predator](/coming_soon.md "Interactive Predator Example")
 ---
-* [Helpful VS Code Extensions](/helpful_vscode_extensions.md "Helpful VS Code Extensions")
+* [Helpful VS Code Extensions](/helpful_vscode_extensions.md "Helpful VS Code Extensions") -->
