@@ -4,6 +4,8 @@
 ---
 * [Hello Psyanim 2.0](/overview/hello_psyanim_2.md "Hello Psyanim 2.0")
 ---
+* [JsPsych Integration](/overview/jspsych_integration.md "JsPsych Integration")
+---
 <!-- Psyanim Overview
 * [Scenes and Entities](/overview/scenes_and_entities.md "Scenes and Entities")
 * [Entities and Components](/overview/entities_and_components.md "Entities and Components")
