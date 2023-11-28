@@ -241,3 +241,247 @@ Back in your `scene definition` in `WanderScene.js`, import the `MyCustomDebugge
 Reload your experiment in the browser and you should see our `'New wander scene created, logging state for agent: '` message and the `PsyanimWanderBehavior::_angle` property getting printed every second while the trial is running!
 
 ## 6. Creating trial variations with different parameters
+
+Let's create a few additional `wander scene` trials with different parameters to add to our timeline.
+
+In each trial, we will vary the `duration` of the trial, the number of `wander agents` in the scene, and the `agent colors`.
+
+We will also vary some of the parameters of the `wander prefab`.
+
+To start, let's define some trial parameters for each trial in our `index.js`:
+
+```js
+...
+
+/**
+ *  Setup multiple wander scene trials each with different parameters & instanced entities
+ */
+let nTrials = 3;
+
+let trialDurations = [5000, 10000, -1];
+let trialAgentInstances = [3, 6, 20];
+let trialAgentColors = [ 0x32CD32, 0xBC13FE, 0xFFC0CB ];
+
+let trialPrefabParams = [
+    {
+        radius: 30,
+        maxWanderSpeed: 3.0,
+        maxAcceleration: 0.02,
+        maxAngleChangePerFrame: 10
+    },
+    {
+        radius: 30,
+        maxWanderSpeed: 1.5,
+        maxAcceleration: 0.02,
+        maxAngleChangePerFrame: 10
+    },
+    {
+        radius: 50,
+        maxWanderSpeed: 3,
+        maxAcceleration: 0.2,
+        maxAngleChangePerFrame: 20
+    }
+];
+
+...
+```
+
+There are many ways we can manage our parameter-sets for each trial in our experiments, and this is just a simple one that's (hopefully) easy to understand quickly.
+
+That said, there are no hard-and-fast rules for how we manage our parameter-sets, so please feel free to modify this approach to suit your own experiment's needs.
+
+Ultimately, the only thing that matters is that the `PsyanimJsPsychTrial` object you add to your timeline has all the information it needs about your scene and parameters for each trial.
+
+How you get that information into it is intentionally left up to the user.
+
+Here, we're setting up the parameters for 3 trials, thus we see an `array` of length `3` for each `parameter type`.
+
+The parameter-set for each trial is identified by an index into each array.
+
+So, for example, the 2nd trial of this set would be index `0` in these parameter arrays, giving it a trial duration of `10000`, `6` agent instances, and an agent color of `0xBC13FE`.
+
+The second trial would also have a `prefab parameter-set` of: 
+
+```js
+{
+    radius: 30,
+    maxWanderSpeed: 1.5,
+    maxAcceleration: 0.02,
+    maxAngleChangePerFrame: 10
+},
+```
+
+Now that we've defined our parameter-sets for each trial, let's loop over these trial parameter-sets and add a trial to our timeline for each one as follows:
+
+```js
+...
+
+for (let i = 0; i < nTrials; ++i)
+{
+    // create trial from template using a unique scene key
+    let wanderSceneKey = WanderScene.key + '_' + i;
+    wanderSceneTrial = new PsyanimJsPsychTrial(WanderScene, wanderSceneKey);
+
+    // set trial params
+    wanderSceneTrial.duration = trialDurations[i];
+
+    // set entity params
+    wanderSceneTrial.setEntityParameter('agent', 'instances', trialAgentInstances[i]);
+    wanderSceneTrial.setEntityShapeParameter('agent', 'color', trialAgentColors[i]);
+
+    // set prefab params
+    let currentPrefabParams = trialPrefabParams[i];
+
+    for (let paramKey in currentPrefabParams)
+    {
+        wanderSceneTrial.setPrefabParameter('agent', paramKey, currentPrefabParams[paramKey]);
+    }
+
+    // setup recording params
+    wanderSceneTrial.addAgentNamesToRecord(['agent*']);
+
+    // push trial into timeline
+    timeline.push(wanderSceneTrial.jsPsychTrialDefinition);
+}
+
+...
+```
+
+Here, we loop over each `trial parameter-set` we've create, instantiating a new `PsyanimJsPsychTrial` for each one, using the `WanderScene` definition.
+
+Before pushing the newly created trials into our `jsPsych timeline` array, we set the `trial params`, `entity params`, and `prefab params` using the previously declared parameter arrays and the appropriate `array index` for that `trial`.
+
+Great work - reload your experiment in the browser and you should see 3 new trials, each with the corresponding number of agents, colors, and trial durations.
+
+## 7. Saving experiment data out to firebase firestore
+
+The `PsyanimJsPsychPlugin` is designed to handle all interactions & writing of data to firebase firestore during the experiment w/ minimal input from the experiment developer.
+
+There are various types of data that can be persisted in firebase, each with its own `firestore collection` type:
+
+- `trial-metadata`: Metadata about each trial, including trial parameters.
+- `animation-clips`: These are agent/entity trajectories recorded during a trial.
+- `jspsych-experiment-data`: This is the `jsPsych.data` object created during the trial.
+- `session-logs`: This is the output of any `PsyanimDebug.log()`, `PsyanimDebug.warn()` or `PsyanimDebug.error()` statements called during the experiment.
+- `state-logs`: This is the state information (states/transitions + times) for any agent running a particular state-machine for a behavior, within the `Psyanim Decision-Making Framework`
+
+You can check out the [database schema](TODO://broken-link) to see more details on the structure and relationships of each of these collections.
+
+For now, just know that these exist and the data recorded in each of them is highly configurable per-trial via the and `PsyanimJsPsychTrial` interfaces.
+
+To enable data-saving to `firebase firestore` in your experiment, you first need to import your `firebase.config.json` in your `index.js`, which should be at the root of your project:
+
+```js
+...
+import firebaseJsonConfig from '../firebase.config.json';
+...
+```
+
+Then, in the section of the `index.js` where we setup the `PsyanimJsPsychPlugin`, add the following code to create a `PsyanimFirebaseBrowserClient` and set it as the `document writer` of the `PsyanimJsPsychPlugin`:
+
+```js
+...
+const firebaseClient = new PsyanimFirebaseBrowserClient(firebaseJsonConfig);
+PsyanimJsPsychPlugin.setDocumentWriter(firebaseClient);
+...
+```
+
+And that's all!  The `PsyanimJsPsychPlugin` will now save all of it's data out to `firestore` at the end of every trial.
+
+## 8. Writing jsPsych.data out to firebase firestore
+
+As with any `jsPsych` experiment, we may want to capture the contents of the `jsPsych.data` object at various points throughout the experiment.
+
+In most cases, we do not want to wait until the end of the experiment to do so, as a program crash or a closed browser tab could cause us to lose data for trials that have already been completed.
+
+Instead, we will use a custom [jsPsych extension](https://www.jspsych.org/7.3/overview/extensions/) written specifically for `psyanim 2` called the `PsyanimJsPsychDataWriterExtension`.
+
+With this extension enabled, and as long as your experiment's `firebase client` and `PsyanimJsPsychPlugin` is all configured properly, the `jsPsych.data` object will get written out at the end of any trial for which the extension is added.
+
+The first thing you should do to use this extension is to update your `psyanim2` import statement to include the `PsyanimJsPsychDataWriterExtension` class.
+
+Then, we need to update our `initJsPsych()` call to enable the use of the extension and supply the extension the necessary experiment-level parameters:
+
+```js
+...
+
+/**
+ *  Setup jsPsych experiment
+ */
+const jsPsych = initJsPsych({
+
+    extensions: [
+        { 
+            type: PsyanimJsPsychDataWriterExtension, 
+            params: { 
+                documentWriter: firebaseClient,
+                userID: userID,
+                experimentName: experimentName
+            }
+        }
+    ],
+});
+
+...
+```
+
+For non-PsyanimJsPsychPlugin trials, you will just manually add an `extensions` field to your `trial object` containing a reference to this extension.
+
+As an example, this is how you'd add this extension to the `'welcome' trial` in our experiment:
+
+```js
+// 'Welcome' trial
+timeline.push({
+    type: htmlKeyboardResponse,
+    stimulus: "<p style='text-align:center'>Welcome to the experiment.  Press any key to begin.</p>",
+    extensions: [
+        { type: PsyanimJsPsychDataWriterExtension }
+    ],
+});
+```
+
+For all PsyanimJsPsychPlugin trials, you can simply call `addExtension` on the `PsyanimJsPsychTrial` object before pushing it onto the `jsPsych timeline`:
+
+```js
+...
+
+// add jsPsych.data writer extension
+wanderSceneTrial.addExtension(PsyanimJsPsychDataWriterExtension);
+
+...
+```
+
+Go ahead and add the extension to every trial in your timeline, including the `'end' trial`.
+
+And voila, that's all you need to do to save out the `jsPsych.data` object at the end of any trial.
+
+The data will be saved under the `/jspsych-experiment-data` collection in `firestore` and the `document ID` will be the `session ID` for that experiment session.
+
+## 9. Visualizing experiment data with experiment viewer
+
+***// TODO: explain the pre-requisite for this section is to download the `service-account.json` file and how to do this***
+
+To visualize data recorded from completed experiments, `psyanim2` ships with a tool called `Psyanim Experiment Viewer`.
+
+Once an experiment's data has been saved to `firebase firestore`, the entire experiment can be played back using the `trial-metadata` for each trial and the associated trajectories store in the `/animation-clips` collection.
+
+// TODO: need to look at `react-mvc-tests` branch of experiment viewer repo b.c. it looks like that is where you added the modular query filters via cmd line syntax
+//          initial testing looks like it's in working order... but do a bit more testing to be sure before integrating it into `dev` and `master`
+
+// TODO: elaborate on these steps here
+
+- checkout experiment viewer app from: https://github.com/thefinnlab/psyanim-experiment-viewer
+- add service-account.json to root of app directory
+- npm i
+- npm run build (to build client)
+- npm run serve (to run server)
+
+## 10. Custom queries with psyanim-cli
+
+- show how the `psyanim-cli` can be used for exploratory analysis and building query filters for experiment viewerf
+- show how the `psyanim-cli` can be used to build little cmd line tools around firebase queries
+
+## 11. Saving trial collection files from experiment viewer
+
+## 12. Real-time playback of trial-collections during experiment
+
