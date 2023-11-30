@@ -631,9 +631,17 @@ Each `trial` in our database has a corresponding `firestore document` in the `/t
 
 To see how to filter the data presented by `experiment viewer`, let's create a custom `dataProvider` module.
 
-Create a new file under `./sample_firestore_queries/myCustomDataProvider.js` and copy the following code into it:
+Let's create a new custom data provider mdoule using `psyanim-cli`:
+
+```bash
+psyanim --dataprovider myCustomDataProvider.js
+```
+
+Replace the body of the function with the following query:
 
 ```js
+...
+
 export function dataProvider(firebaseClient, dataHandler) {
 
     firebaseClient.db
@@ -645,6 +653,8 @@ export function dataProvider(firebaseClient, dataHandler) {
             dataHandler(querySnapshot.docs);
         });
 };
+
+...
 ```
 
 The only constraint here is that the exported `dataProvider` function signature must match what we had in the `defaultDataProvider.js` module.
@@ -656,7 +666,7 @@ Here, you'll see a `.where()` method in which we specify that we only want to se
 To run `Psyanim Experiment Viewer` with our new custom query module, the command line syntax is:
 
 ```bash
-npm run serve ./sample_firestore_queries/myCustomDataProvider.js
+npm run serve ./src/myCustomDataProvider.js
 ```
 
 After running the server with this new `dataProvider` module, reload the app in your browser and you should only see scenes where the `sceneKey` is 'Wander Scene`.
@@ -671,9 +681,182 @@ Great work!  In summary, the experiment viewer can be run with any custom `dataP
 
 ## 11. Real-time playback of trial-collections during experiment
 
-// TODO: elaborate on / explain these steps:
+***WARNING: For this section, make sure the `firebase cloud project` that your `firebase.config.json` points to is not a production database, so we can *safely* overwrite its contents!***
 
-- delete cloud db and restore one of the sample datasets (warn user to verify it's not a production DB!)
-- write custom query module for filtering on specific user
-- save trial collection files in experiment viewer using the current experiment project
-- checkout demo project for real-time playback, discuss the components and template scenes
+Out-of-the-box, Psyanim 2 comes with `components` and `template scenes` that allow us to quickly setup `real-time playback` of any recorded `trial` in `firebase` during an experiment.
+
+To see this in action, there is already a demo project in the `hello-psyanim2` repository under the branch `experiment-player-example`.
+
+---
+
+In our `hello-psyanim2` repo, let's checkout this branch with:
+
+```bash
+git checkout experiment-player-example
+```
+
+Your `firebase.config.json` should still be in the root of this project.
+
+Delete the `./dist` and `./node_modules` directories, as these contain dependencies and packaged builds for a different branch.
+
+Run `npm i` again to install the dependencies for this branch.
+
+Run a watch service with `npm run watch` in one terminal, and the local server in another terminal with `npm run serve`.
+
+Now this `experiment-player-demo` branch is all ready to use.  However, our database doesn't have the data it expects yet.
+
+---
+
+Let's update the `firestore cloud database` to have the proper data needed to run the example demo.
+
+Switch back over to your `Psyanim Experiment Viewer` project, as it has some scripts to help us push some test data into the cloud database.
+
+First off, let's delete everything in our `firestore cloud database` with the following command:
+
+```bash
+npm run delete-cloud-db
+```
+
+Next, let's open up `./sample_firestore_queries/restoreCloudDB.js` and replace the `localDataStoreRootPath` at the top of the file with:
+
+```js
+...
+const localDataStoreRootPath = './sample_firestore_datasets/2-experiments-5-users';
+...
+```
+
+This sample script shows how to restore a `firestore cloud datbase` from a local flat-file copy of a `Psyanim 2 Database`.
+
+By changing the `localDataStoreRootPath` in this `restoreCloudDB.js` query script, we've told it to restore the `2-experiments-5-users` database.
+
+This database has trials 2 different `experiments` with 5 different `users`, so it's a good dataset for learning & regression testing with.
+
+You can create new local copies of your `firestore cloud database` anytime using the `dumpDatabaseToDisk.js` script.
+
+For now, however, we will work with the `2-experiments-5-users` dataset for our demo.
+
+To run this script, use `psyanim-cli`:
+
+```bash
+psyanim -q ./sample_firestore_queries/restoreCloudDB.js
+```
+
+You should now have all of the data from the `2-experiments-5-users` directory in your `firestore cloud database`.
+
+---
+
+Now that we have a test dataset to run our demo with, we can switch back over to our `hello-psyanim2` repo's `experiment-player-example` branch.
+
+We've already started a watch service and local server on port 3000, so let's navigate to `localhost:3000` in our browser to see this in action.
+
+You should see all the trials playing from `UserB`, as this is what the `experiment-player-example` was configured to do by default.
+
+---
+
+The way the `experiment-player-example` demo app knew to only pull data from `UserB` to playback during the experiment is because that's all that was added to it's `Trial Collection Files`.
+
+A `Trial Collection File` in `Psyanim 2` is just a file that contains metadata about a collection of `trials` in our database.
+
+In this case, we only added trials to this `Trial Collection File` to be played back that were from `UserB`.
+
+To generate this `Trial Collection File`, it's convenient to use `Psyanim Experiment Viewer` because it allows you to visualize each trial before adding it to a file.
+
+It's also possible generate this file by creating a custom query module to run in `psyanim-cli`, but that's a more advanced topic we won't approach here.
+
+---
+
+To get a feel for how to generate these `Trial Collection Files`, let's hop back over to our `Psyanim Experiment Viewer` project.
+
+Let's create a new `Trial Collection File` that only contains `trial metadata` for `UserC` instead of `UserB`.
+
+Create a new `data provider` module for `Experiment Viewer` with the following command:
+
+```bash
+psyanim -d myDataProviderUserC
+```
+
+Open this file up and replace the body of the `dataProvider()` function with:
+
+```js
+export function dataProvider(firebaseClient, dataHandler) {
+
+    firebaseClient.db
+        .collection('trial-metadata')
+        .where('data.userID', '==', 'UserC')
+        .get()
+        .then((querySnapshot) => {
+
+            let docs = querySnapshot.docs;
+
+            dataHandler(docs);
+        });
+};
+```
+
+Now let's start the `Psyanim Experiment Viewer` with the following command (may need to kill the old instance if you didn't already):
+
+```bash
+npm run serve ./src/myDataProviderUserC.js
+```
+
+If you peek through all the trials presented by `Experiment Viewer`, you'll see there are only trials for `UserC` now.
+
+Remember, this is thanks to the custom `data provider` module we passed to the server on startup.
+
+If you inspect the page, there is an `input text field` with the label `Trial Collection File Name` and it should contain `defaultTrialCollection`.
+
+This is the name of `Trial Collection File` we're going to be adding trials to.  The default name is fine for our purposes here, but you can always change it.
+
+You'll also notice there is a `Save Trial ID` button.  If you click this on any trial, you'll notice a `./trial_collections` directory was created in your `Experiment Viewer` project with a `defaultTrialCollection.json` file in it.
+
+You have just added this `trial` to your `Trial Collection File`.  The `Save Trial ID` button will add any trial to the `Trial Collection File` only if it doesn't exist already.
+
+Go ahead and run through all the trials from `UserC`, saving them all to your `defaultTrialCollection.js` file.
+
+---
+
+Now that we've created a new `Trial Collection File` containing all of the `trials` for `UserC`, we can simply copy this file from our `Experiment Viewer` project into the `./src` directory of our `hello-psyanim2` repo, replacing the previous `defaultTrialCollection.json` file that was there.
+
+Since we already started the watch service and local server for this project, you should be able to just reload `localhost:3000` in your browser and see the new data from `UserC` playing back in real-time from `firestore`.
+
+Great work - you've created your first `Trial Collection File` with hand-selected trials and added them to an experiment to play back in real-time!
+
+---
+
+To wrap things up, let's break down how the real-time playback was setup in the `index.js` of the `experiment-player-example` branch of our `hello-psyanim2` repo.
+
+If you peek at the `psyanim2` package imports at the top of the `index.js`, notice the trial loaders and scene templates at the end of the list.
+
+The `PsyanimJsPsychTrialLoader` is a `Psyanim Component` that loads the data for our experiment from `firestore` on startup.
+
+The `PsyanimJsPsychTrialSelector` is a `Psyanim Component` that randomly samples trials (without replacement) to be played back one at a time during the experiment.
+
+The `PsyanimJsPsychExperimentLoadingSceneTemplate` is a template scene we can use to load all of the trials that will be used in our experiment.
+
+The `PsyanimJsPsychExperimentPlayerSceneTemplate` is a template scene we can use to playback any trial in our experiment.
+
+The template scenes are there to minimize the boiler-plate you have to write, since all loading & playback scenes will look very similar, if not the same.
+
+Feel free to craft these by hand if you want to understand things better or customize them though!
+
+Everything else in the `index.js` should be familiar to you, so we can skip ahead to where we setup the `experiment loader scene trial` and the `main playback scene trials`.
+
+The `experiment loader scene trial` has to run *before* any `trials` can be played back from `firestore`.
+
+It only has 2 parameters you need to configure on the `PsyanimJsPsychTrialLoader` component - `trialInfo` and `documentReader`.
+
+The `trialInfo` is just an array of trial objects from your `Trial Collection Files`.  The `documentReader` is just the `firebase client` reference.
+
+The `main playback scene trials` are the trials that will actually play back data from `firestore`.
+
+This scene only has 1 parameter on a `PsyanimJsPsychTrialSelector` component that you need to configure - `trialInfo`.
+
+The `trialInfo` here is also just an array of objects from your `Trial Collection Files`.
+
+---
+
+And this wraps up the `Psyanim-jsPsych Integration` tutorial!
+
+Great work!  There's still a lot more to learn and many more features we couldn't discuss here.
+
+A great way to keep exploring is to create new experiments, scenes and components, and dive into some of the `psyanim2 core` code itself.
