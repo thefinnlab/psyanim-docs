@@ -457,31 +457,223 @@ And voila, that's all you need to do to save out the `jsPsych.data` object at th
 
 The data will be saved under the `/jspsych-experiment-data` collection in `firestore` and the `document ID` will be the `session ID` for that experiment session.
 
-## 9. Visualizing experiment data with experiment viewer
-
-***// TODO: explain the pre-requisite for this section is to download the `service-account.json` file and how to do this***
+## 9. Visualizing trial data with Experiment Viewer
 
 To visualize data recorded from completed experiments, `psyanim2` ships with a tool called `Psyanim Experiment Viewer`.
 
 Once an experiment's data has been saved to `firebase firestore`, the entire experiment can be played back using the `trial-metadata` for each trial and the associated trajectories store in the `/animation-clips` collection.
 
-// TODO: need to look at `react-mvc-tests` branch of experiment viewer repo b.c. it looks like that is where you added the modular query filters via cmd line syntax
-//          initial testing looks like it's in working order... but do a bit more testing to be sure before integrating it into `dev` and `master`
+To get started, clone the [Psyanim Experiment Viewer](https://github.com/thefinnlab/psyanim-experiment-viewer) repository.
 
-// TODO: elaborate on these steps here
+Next, we need to add a `private key file` for our `firebase project` to our `Experiment Viewer` root folder so the app is able to access our `firestore` data. 
 
-- checkout experiment viewer app from: https://github.com/thefinnlab/psyanim-experiment-viewer
-- add service-account.json to root of app directory
-- npm i
-- npm run build (to build client)
-- npm run serve (to run server)
+---
+
+Similar to how `jsPsych experiments` using the `PsyanimJsPsychPlugin` require a `firebase.config.json` in order to authenticate with a `firebase firestore` cloud service, the `Experiment Viewer` requires a `private key file` for your `firebase` service account.
+
+To generate this `private key file`, follow the instructions [here](https://firebase.google.com/docs/admin/setup#initialize_the_sdk_in_non-google_environments).
+
+Once you have downloaded your `private key file`, move it to a secure location in your local development environment for future use.
+
+Copy this `private key file` into the root of the `Psyanim Experiment Viewer` project, renaming the copy to `'service-account.json'` and you're all setup to access your `firestore` data.
+
+---
+
+Now that we've got our `service-account.json` file in the root of our `Experiment Viewer` project, we're ready to build the app and load it in the web browser.
+
+First let's install dependencies with:
+
+```bash
+npm i
+```
+
+Next, let's bundle the client app with:
+
+```bash
+npm run build
+```
+
+Then, let's start the `Psyanim Experiment Viewer` server to host the app:
+
+```bash
+npm run serve
+```
+
+Finally, in a browser, navigate to `localhost:7000` and you should see the experiment viewer app!
+
+---
+
+When you first load experiment viewer up, you will see a trial played back.  This trial is part of a collection of trials you can view.
+
+To navigate through the available trials to view, use the `J` and `K` (for 'previous' and 'next' trials, respectively) keys on your keyboard.
+
+To replay the current trial from the beginning, press the `Spacebar`.
+
+Great work - you've mastered the basics of using `Psyanim Experiment Viewer`.
+
+Don't worry abourt the `Trial Collection File Name` input field or the `Save Trial ID` button for now.  We will discuss the use of that later.
 
 ## 10. Custom queries with psyanim-cli
 
-- show how the `psyanim-cli` can be used for exploratory analysis and building query filters for experiment viewerf
-- show how the `psyanim-cli` can be used to build little cmd line tools around firebase queries
+By default, `Psyanim Experiment Viewer` will load up every single trial that's ever been recorded in the `firestore` database associated with your `service-account.json` key file.
 
-## 11. Saving trial collection files from experiment viewer
+This is not ideal, however, as the number of trials in the database could be enormous, and ultimately cause `Experiment Viewer` to crash.
 
-## 12. Real-time playback of trial-collections during experiment
+To avoid loading the entire database into the `Experiment Viewer`'s server memory, we should write a custom query script to filter out the data we want by some constraint(s).
 
+However, before we look at how to apply custom queries to filter the data we want from `firestore`, it would be nice if we had some easy way to do quick exploratory analysis on what's currently in the database.
+
+For this, `psyanim-cli` is just the tool for the job, as it has a feature to run custom query scripts at any time against the `firestore` database associated with 
+
+--- 
+
+In the root of your `Experiment Viewer` project, run the following command:
+
+```bash
+psyanim --query ./sample_firestore_queries/listCollections.js
+```
+
+You should've seen the following output:
+
+```
+Running query...
+
+Found collection with id:  animation-clips
+Found collection with id:  jspsych-experiment-data
+Found collection with id:  session-logs
+Found collection with id:  trial-metadata
+```
+
+So what happened here?  To illuminate this a bit more, open up `./sample_firestore_queries/listCollections.js` and you should see the following code:
+
+```js
+export function psyanimCliQuery(db) {
+
+    db.listCollections()
+        .then((collections) => {
+
+            collections.forEach(c => {
+                console.log('Found collection with id: ', c.id);
+            });
+        });
+};
+```
+
+The javascript module `listCollections.js` is a `custom query script` that exports a single function: `psyanimCliQuery(db) { ... }`.
+
+`psyanim-cli` can be used to run these `custom query scripts` from any directory that has a `service-account.json` file in it, simply by passing `--query` or `-q` and then the path to the query script module.
+
+The only constraints on the query script is that it must export a function with the following signature: `psyanimCliQuery(db) { ... }`.
+
+The `psyanimCliQuery(db)` function will be called by psyanim-cli and passed an instance to the `cloud firestore service` object from the [firebase admin sdk](https://firebase.google.com/docs/firestore/quickstart#initialize).
+
+With this `cloud firestore service` object reference inside the `psyanimCliQuery` function, you can provide any custom query on the database you want, and can also run any other javascript code on that data that you want, including writing it out to disk or reading from disk and writing it out to the cloud database!
+
+The `listCollections.js` sample query script is just a very simple example of how to query the `cloud firestore service` object to get all the names of the collections in the firestore database, and then print them to the console.
+
+Some more complex, but very useful, sample scripts in the `./sample_firestore_queries/*` directory are the `dumpDatabaseToDisk.js` script and the `restoreCloudDB.js` script.  They allow you to pull the entire cloud db locally and write it out to disk as flat-files with the same structure as the collections in the cloud db, and vice-versa (reading a local flat-file db into the cloud service).
+
+---
+
+Now that we're a bit familiar with custom queries, let's see how we casn perform one of these custom queries as a filter for the data presented by `Psyanim Experiment Viewer`.
+
+Let's inspect the contents of `./sample_firestore_queries/defaultDataProvider.js`:
+
+```js
+/**
+ * Data provider should query the 'firebaseClient' (can do a custom query)
+ * and then pass the array of docs to the 'dataHandler'.
+ * 
+ * @param {*} firebaseClient 
+ * @param {*} dataHandler 
+ */
+export function dataProvider(firebaseClient, dataHandler) {
+
+    /**
+     *  firebaseClient.db is a firestore db reference.
+     *  
+     *  To see how to perform custom queries:
+     *  https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    firebaseClient.db
+        .collection('trial-metadata')
+        // .where('data.experimentName', '==', 'Second Experiment')
+        // .where('data.userID', '==', 'UserC')
+        // .where('data.sessionID', '==', '94f95b37-ea61-49ec-a90d-2dd21d4c6409')
+        .get()
+        .then((querySnapshot) => {
+
+            let docs = querySnapshot.docs;
+
+            // can also filter the returned query result for more complex queries
+            // let docs = querySnapshot.docs.filter(doc => {
+            //     return doc.get('data.userID') == 'UserC';
+            // });
+
+            dataHandler(docs);
+        });
+};
+```
+
+Similar to the custom query scripts accepted by `psyanim-cli`, the `Psyanim Experiment Viewer` also accepts custom query scripts as its input.
+
+When `Psyanim Experiment Viewer`'s server starts up, it registers a callback with a `dataProvider` function when it executes it, allowing the data provider to fetch data and pass it to the callback for the `Experiment Viewer` to process.
+
+So, `Experiment Viewer` is not aware of where its data actually comes from - so long as the data is provided to the callback it registered.
+
+The signature of this function is: `dataProvider(firebaseClient, dataHandler)`, where `firebaseClient` is the `cloud firestore service` object from the `firebase admin sdk` (just like `psyanim-cli`), and the `dataHandler` is a callback that will send data to the `Experiment Viewer`.
+
+By default, if no custom `dataProvider` module is supplied to `Psyanim Experiment Viewer`, it will use the `defaultDataProvider.js` under `./sample_firestore_queries`.
+
+The `defaultDataProvider.js` just pulls all of the documents in the firestore `/trial-metadata` collection and passes them to the `Psyanim Experiment Viewer` for viewing.
+
+Each `trial` in our database has a corresponding `firestore document` in the `/trial-metadata` collection, so you can see how large this collection might grow.
+
+To see how to filter the data presented by `experiment viewer`, let's create a custom `dataProvider` module.
+
+Create a new file under `./sample_firestore_queries/myCustomDataProvider.js` and copy the following code into it:
+
+```js
+export function dataProvider(firebaseClient, dataHandler) {
+
+    firebaseClient.db
+        .collection('trial-metadata')
+        .where('data.sceneKey', '==', 'WanderScene')
+        .get()
+        .then((querySnapshot) => {
+
+            dataHandler(querySnapshot.docs);
+        });
+};
+```
+
+The only constraint here is that the exported `dataProvider` function signature must match what we had in the `defaultDataProvider.js` module.
+
+Other than that, we can run whatever queries we want and do any custom filtering on the data as necessary.
+
+Here, you'll see a `.where()` method in which we specify that we only want to see trials for which the `sceneKey` field is equal to `WanderScene`.
+
+To run `Psyanim Experiment Viewer` with our new custom query module, the command line syntax is:
+
+```bash
+npm run serve ./sample_firestore_queries/myCustomDataProvider.js
+```
+
+After running the server with this new `dataProvider` module, reload the app in your browser and you should only see scenes where the `sceneKey` is 'Wander Scene`.
+
+In general, the syntax for running `Psyanim Experiment Viewer` with a different `dataProvider` is:
+
+```bash
+npm run serve <path-to-data-provider>
+```
+
+Great work!  In summary, the experiment viewer can be run with any custom `dataProvider` module in order to limit or filter the data that it presents during usage in the browser.
+
+## 11. Real-time playback of trial-collections during experiment
+
+// TODO: elaborate on / explain these steps:
+
+- delete cloud db and restore one of the sample datasets (warn user to verify it's not a production DB!)
+- write custom query module for filtering on specific user
+- save trial collection files in experiment viewer using the current experiment project
+- checkout demo project for real-time playback, discuss the components and template scenes

@@ -3,7 +3,6 @@
 * [Home](/ "Psyanim 2.0")
 ---
 * [Hello Psyanim 2.0](/overview/hello_psyanim_2.md "Hello Psyanim 2.0")
----
 * [JsPsych Integration](/overview/jspsych_integration.md "JsPsych Integration")
 ---
 <!-- Psyanim Overview
