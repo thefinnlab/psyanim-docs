@@ -4,24 +4,5 @@
 ---
 * [Hello Psyanim 2.0](/overview/hello_psyanim_2.md "Hello Psyanim 2.0")
 * [JsPsych Integration](/overview/jspsych_integration.md "JsPsych Integration")
+* [Artificial Intelligence](/overview/artificial_intelligence_in_psyanim2.md)
 ---
-<!-- Psyanim Overview
-* [Scenes and Entities](/overview/scenes_and_entities.md "Scenes and Entities")
-* [Entities and Components](/overview/entities_and_components.md "Entities and Components")
-* [Entity Prefabs](/overview/entity_prefabs.md "Entity Prefabs")
-* [JsPsych Integration](/overview/jspsych_integration.md "JsPsych Integration")
-* [Experiment Recording and Playback](/coming_soon.md "Experiment Recording and Playback")
-* [AI Steering Architecture](/coming_soon.md "AI Steering Architecture")
----
-Psyanim In-Depth
-* [Entities and Components](/coming_soon.md "Entities and Components")
-* [Entity Prefabs](/coming_soon.md "Entity Prefabs")
----
-Full Example Experiments
-* [Predator-Prey](/example_experiments/predator_prey.md "Predator-Prey Experiment")
----
-Psyanim Core Examples
-* [Start Here](/psyanim_core_examples/start_here.md "Psyanim Core Usage Examples")
-* [Interactive Predator](/coming_soon.md "Interactive Predator Example")
----
-* [Helpful VS Code Extensions](/helpful_vscode_extensions.md "Helpful VS Code Extensions") -->
