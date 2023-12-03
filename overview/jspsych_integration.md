@@ -1,6 +1,6 @@
 # Psyanim 2.0: jsPsych Integration Tutorial
 
-***Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2).***
+***Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2) in the `psyanim-jspsych-integration` branch.***
 
 ***If, at any time, you're uncertain of what the final code should look like for a section, please refer to the project source code above.***
 

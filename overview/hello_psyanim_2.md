@@ -1,6 +1,6 @@
 # <ins>Getting Started with Psyanim 2.0</ins>
 
-Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2).
+***Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2).***
 
 ## 1. Core concepts
 

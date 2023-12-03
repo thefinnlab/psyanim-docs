@@ -1,5 +1,7 @@
 # Artificial Intelligence in Psyanim-2
 
+***Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2) in the `artificial_intelligence` branch.***
+
 ## 1. Core concepts
 
 `Psyanim-2` has a small, but continuously growing library of reusable `Artificial Intelligence` (AI) components that support agent `movement` and `decision-making` in real-time, interactive environments.
