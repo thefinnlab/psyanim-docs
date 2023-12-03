@@ -42,12 +42,30 @@ Here's a link to the [book](https://natureofcode.com/book/chapter-6-autonomous-a
 
 Here's a link to the [video lectures](https://youtu.be/P_xJMH8VvAE?si=XOgqMA1L8bJlxea2).
 
-## 3. Kinematic Movement Algorithms and Steering Behaviors
+## 3. AI Steering Behaviors and Agents in Psyanim 2
 
 ***Coming soon***
 
-## 4. State Machines & Decision-Making Framework
+***Before you proceed with the rest of this tutorial, if you don't have time to study the above resources, I would at least watch the following videos first to familiarize yourself with AI steering behaviors and finite state machines:***
+
+- [Nature of Code: Autonomous Steering Agents Introduction](https://youtu.be/P_xJMH8VvAE?si=ichCvB3RTCJIHWI3)
+
+- [Nature of Code: Seeking a Target](https://youtu.be/p1Ws1ZhG36g?si=k0oiIVLYjUoEARKL)
+
+- [Finite State Machines](https://youtu.be/-ZP2Xm-mY4E?si=EqXvvlS4jHFMAzKb)
+
+## 4. State Machines & Decision-Making Framework in Psyanim 2
 
 ***Coming soon***
+
+One big advantage of a state machine is that it can be easily visualized and reasoned about using simple boxes and arrows.
+
+When designing a state machine for any purpose, I always start with a pencil and a piece of paper, sketching out the `states` represented by `boxes` and `allowed transitions` represented by `arrows`.
+
+I highly recommend that, before trying to code up any state machine, you start by sketching out a simple diagram of it's design to make it easy to reason about as you implement it.
+
+<p align="center">
+  <img src="./imgs/ai_fsm_design.jpg" />
+</p>
 
 refs: https://gameprogrammingpatterns.com/state.html
