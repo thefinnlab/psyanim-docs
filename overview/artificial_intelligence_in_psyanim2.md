@@ -14,6 +14,16 @@ The types of `movement algorithms` used are primarily `kinematic movement algori
 
 ## 2. Best References for AI Techniques used in Psyanim-2
 
+***Before you proceed with the rest of the tutorial sections, if you don't have time to study the resources listed in this section in great detail, I would at least watch the following videos first to familiarize yourself with AI steering behaviors and finite state machines:***
+
+- [Nature of Code: Autonomous Steering Agents Introduction](https://youtu.be/P_xJMH8VvAE?si=ichCvB3RTCJIHWI3)
+
+- [Nature of Code: Seeking a Target](https://youtu.be/p1Ws1ZhG36g?si=k0oiIVLYjUoEARKL)
+
+- [Finite State Machines](https://youtu.be/-ZP2Xm-mY4E?si=EqXvvlS4jHFMAzKb)
+
+That said, if you do have more time and would like to do a deeper dive into relevant AI techniques, here are 3 resources that contain all you really need to know about creating AI agent behaviors in `psyanim2`:
+
 ***1. "AI for Games" by Ian Millington***
 
 This book is the absolute best reference I've ever come across for all things Artificial Intelligence in games (or real-time, interactive simulations).
@@ -44,19 +54,24 @@ Here's a link to the [video lectures](https://youtu.be/P_xJMH8VvAE?si=XOgqMA1L8b
 
 ## 3. AI Steering Behaviors and Agents in Psyanim 2
 
-***Coming soon***
+TODO: this is a WIP still!
 
-***Before you proceed with the rest of this tutorial, if you don't have time to study the above resources, I would at least watch the following videos first to familiarize yourself with AI steering behaviors and finite state machines:***
 
-- [Nature of Code: Autonomous Steering Agents Introduction](https://youtu.be/P_xJMH8VvAE?si=ichCvB3RTCJIHWI3)
+Let's get started by creating a new, empty `psyanim2` project using `psyanim-cli` as we did in the [Hello Psyanim 2.0 tutorial](/overview/hello_psyanim_2.md#2-creating-a-new-psyanim-2-project).
 
-- [Nature of Code: Seeking a Target](https://youtu.be/p1Ws1ZhG36g?si=k0oiIVLYjUoEARKL)
+You can delete the `EmptyScene.js` and remove all the commented out code from the `index.js`. 
 
-- [Finite State Machines](https://youtu.be/-ZP2Xm-mY4E?si=EqXvvlS4jHFMAzKb)
+Let's create an new scene with `psyanim-cli`:
 
-## 4. State Machines & Decision-Making Framework in Psyanim 2
+```bash
+psyanim -s HelloAIScene
+```
 
-***Coming soon***
+
+
+## 4. Finite State Machines in Psyanim 2
+
+TODO: this is a WIP still!
 
 One big advantage of a state machine is that it can be easily visualized and reasoned about using simple boxes and arrows.
 
