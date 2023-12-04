@@ -54,14 +54,17 @@ Here's a link to the [book](https://natureofcode.com/book/chapter-6-autonomous-a
 
 Here's a link to the [video lectures](https://youtu.be/P_xJMH8VvAE?si=XOgqMA1L8bJlxea2).
 
-## 3. AI Steering Behaviors and Agents in Psyanim 2
+## 3. AI Steering Architecture in Psyanim 2
 
-TODO: this is a WIP still!
+***NOTE: this tutorial assumes some familiarity with the `Seek` steering behavior, as the `Arrive` behavior is just a variant of that.  For more information, see the previous section.***
 
+In this section, we'll get some hands-on experience with the `steering architecture` in `Psyanim 2` by designing an `interactive scene` with an `AI agent` and a `player-controlled agent`.
+
+The `AI agent` will `patrol` back and forth between a few points in the world, and when approached by the `player-controlled agent`, the `AI agent` will `flee` from it, waiting a bit some distance away before attempting to return back to it's `patrol`.
+
+We will give the AI agent a 'brain' later to decide how to switch between behaviors (known as `decision-making` in game AI), but for this section, let's just get the AI agent patrolling between a few points using a `pathfollowing` steering behavior, so we can learn a bit about the `steering architecture` in general.
 
 Let's get started by creating a new, empty `psyanim2` project using `psyanim-cli` as we did in the [Hello Psyanim 2.0 tutorial](/overview/hello_psyanim_2.md#2-creating-a-new-psyanim-2-project).
-
-You can delete the `EmptyScene.js` and remove all the commented out code from the `index.js`. 
 
 Let's create an new scene with `psyanim-cli`:
 
@@ -69,7 +72,162 @@ Let's create an new scene with `psyanim-cli`:
 psyanim -s HelloAIScene
 ```
 
+You can delete the `EmptyScene.js`, remove all the commented out code from the `index.js` and add a trial for `HelloAIScene.js` to it.
 
+---
+
+Open `HelloAIScene.js` and let's start building out our scene.  We can delete the `navgrid` property and set the `wrapScreenBoundary` property to `true`.
+
+Update your `psyanim2` package imports at the top so they include the following classes:
+
+```js
+import { 
+    
+    PsyanimConstants,
+    PsyanimPlayerController,
+
+    PsyanimVehicle,
+    PsyanimArriveBehavior,
+    PsyanimArriveAgent,
+    PsyanimPathFollowingAgent,
+
+    PsyanimFleeBehavior,
+    PsyanimFleeAgent
+
+} from 'psyanim2';
+```
+
+Now, let's add a single triangle-shaped entity as our `agent` in the scene:
+
+```js
+...
+{
+    name: 'agent',
+    initialPosition: { x: 100, y: 200 },
+    shapeParams: {
+        shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE,
+        color: 0x0000ff,
+        base: 12, altitude: 20
+    },
+    components: []
+},
+...
+```
+
+Now, we need to add some `components` to this `agent` to get it `patrolling` using a `pathfollowing behavior`.
+
+First, let's add the `PsyanimVehicle` component:
+
+```js
+...
+components: [
+  { type: PsyanimVehicle },
+]
+...
+```
+
+The `PsyanimVehicle` component provides the foundational physics-based interface for applying steering forces to any entity.  All steering behaviors require this component.
+
+Next, we'll want to add a `PsyanimArriveBehavior` component:
+
+```js
+...
+{
+    type: PsyanimArriveBehavior,
+    params: {
+        maxSpeed: 6,
+        innerDecelerationRadius: 4,
+        outerDecelerationRadius: 50
+    }
+},
+...
+```
+
+Don't worry too much about the parameters for the `PsyanimArriveBehavior` here, as those were tuned just to make the motion for this example look nice, but aren't critical to a general understanding of the `steering architecture`.
+
+The `PsyanimArriveBehavior` component is responsible for calculating `steering forces` for an `entity`.
+
+The `PsyanimArriveBehavior` is *not* responsible applying these `steering forces` each frame.  
+
+This separation of concerns is critical to note because these basic `steering behaviors` are designed to be used as building blocks to form more complex behaviors, which will switch between different simpler steering behaviors at runtime.
+
+Thus, to make these `behaviors` reusable across many other more complex behaviors, the `behavior components` themselves do *not* apply `steering forces` to the `PsyanimVehicle`.
+
+They simply compute a `steering force` whenever requested by *something else* and that *something else* is responsible for choosing a force to apply to the `PsyanimVehicle`.
+
+What is this *something else* that requests `steering forces` from `behavior components` each frame and then decides which one(s) to apply to the `PsyanimVehicle`?
+
+The convention in this `steering architecture` is to create an `*Agent` component to do this, with the `*` part of the name denoting a prefix that is specific to the behavior of the `agent`.
+
+For our purposes here, we will use the `PsyanimArriveAgent` component to apply `steering forces` computed by the `PsyanimArriveBehavior` component to the `PsyanimVehicle` each simulation frame:
+
+```js
+...
+{
+    type: PsyanimArriveAgent,
+    params: {
+        arriveBehavior: {
+            entityName: 'agent',
+            componentType: PsyanimArriveBehavior
+        },
+        vehicle: {
+            entityName: 'agent',
+            componentType: PsyanimVehicle
+        }
+    }
+},
+...
+```
+
+Notice that, in the `component definition` above, the `PsyanimArriveAgent` component references the `PsyanimArriveBehavior` and `PsyanimVehicle` components we attached to the same `agent` entity.
+
+This is because, each simulation frame, the `PsyanimArriveAgent` will query the `PsyanimArriveBehavior` for the appropriate `steering force` and then apply it to the `PsyanimVehicle`.
+
+Sometimes, it is helpful to create `*Agent` components which are composed of other `*Agent` components, just to avoid code duplication.
+
+For instance, to make our `agent entity` follow a path consisting of several points in the world, we will need to add a `PsyanimPathFollowingAgent` component which is composed of (or depends on) the `PsyanimArriveAgent` component.
+
+The `PsyanimPathFollowingAgent`'s algorithm updates the `target` of the `PsyanimArriveAgent` each frame so that the `agent entity` is moving in the direction of the next desired point in the world.
+
+Let's add the `PsyanimPathFollowingAgent` to our `agent` entity's `components array` as follows:
+
+```js
+...
+{
+    type: PsyanimPathFollowingAgent,
+    params: {
+        currentPathVertices: [
+            { x: 100, y: 200 },
+            { x: 400, y: 50 },
+            { x: 700, y: 200 },
+        ],
+        arriveAgent: {
+            entityName: 'agent',
+            componentType: PsyanimArriveAgent
+        },
+        targetPositionOffset: 50
+    }
+},
+...
+```
+
+Notice that, as we discussed, the `PsyanimPathFollowingAgent` has a reference to the `PsyanimArriveAgent` component on the same entity.  This is because the `PsyanimPathfollowingAgent` works by controlling the `target` of the `PsyanimArriveAgent` component.
+
+This is a common approach to building more complex behaviors - by combining simpler behaviors within a `state machine` (state machines are discussed more in the next section).
+
+Also note the `path` the agent will follow is defined simply as a `list of points`.  The agent will follow this `path` from start point to end point, and then (by default) reverse direction every time it reaches the end of a path and continue `patrolling` it.
+
+Great work!  By this point, you should have a blue, triangle-shaped agent patrolling back and forth along the path defined by the 3 points we added to our `PsyanimPathFollowingAgent` component.
+
+---
+
+In summary, all `agents` with `steering behaviors` use the `PsyanimVehicle` component to apply `steering forces` to an `entity`.
+
+The `*Behavior` components do *not* apply steering forces to the `PsyanimVehicle`, but they provide an interface to request a `steering force` computation, returning the steering force to the caller.
+
+The `*Agent` components are responsible for querying the `*Behavior` components for steering forces and then deciding how those steering forces get applied to the `PsyanimVehicle` each frame.
+
+This separation of concerns allows for `*Behavior` components to be *reused* in other `*Behavior`s or `*Agents`.
 
 ## 4. Finite State Machines in Psyanim 2
 
