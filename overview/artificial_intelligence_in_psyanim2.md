@@ -60,7 +60,7 @@ Here's a link to the [video lectures](https://youtu.be/P_xJMH8VvAE?si=XOgqMA1L8b
 
 In this section, we'll get some hands-on experience with the `steering architecture` in `Psyanim 2` by designing an `interactive scene` with an `AI agent` and a `player-controlled agent`.
 
-The `AI agent` will `patrol` back and forth between a few points in the world, and when approached by the `player-controlled agent`, the `AI agent` will `flee` from it, waiting a bit some distance away before attempting to return back to it's `patrol`.
+The `AI agent` will `patrol` back and forth between a few points in the world, and when approached by the `player-controlled agent`, the `AI agent` will `flee` from it, waiting for some time at a certain distance away before attempting to return back to it's `patrol`.
 
 We will give the AI agent a 'brain' later to decide how to switch between behaviors (known as `decision-making` in game AI), but for this section, let's just get the AI agent patrolling between a few points using a `pathfollowing` steering behavior, so we can learn a bit about the `steering architecture` in general.
 
@@ -77,6 +77,8 @@ You can delete the `EmptyScene.js`, remove all the commented out code from the `
 ---
 
 Open `HelloAIScene.js` and let's start building out our scene.  We can delete the `navgrid` property and set the `wrapScreenBoundary` property to `true`.
+
+***IMPORTANT NOTE: make sure you set the `wrapScreenBoundary` property to `true`, or our agent's AI behaviors won't work as expected b.c. the world boundaries can't be avoided.***
 
 Update your `psyanim2` package imports at the top so they include the following classes:
 
@@ -231,7 +233,17 @@ This separation of concerns allows for `*Behavior` components to be *reused* in 
 
 ## 4. Finite State Machines in Psyanim 2
 
-TODO: this is a WIP still!
+In order to give the `agent` entity the ability to switch between behaviors, or `make decisions`, based on the state of the world, we need some sort of a structure or pattern to define the logic for these decisions.
+
+Prior the advent of [behavior trees](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control), the structure commonly used in video games for `agent decision-making` was `finite state machines`.
+
+While `behavior trees` have certainly become the de facto standard for most games today due to their flexibility and ease of reuse, they are often still combined with `finite state machines` to produce even more sophisticated behaviors.
+
+`Psyanim 2`'s decision-making framework offers `finite state machines` (or *FSMs*) via the `PsyanimFSM` and `PsyanimFSMState` classes.
+
+While `PsyanimFSM` does not support `hierarchical FSMs` at the moment, the framework can always be extended with `heirarchical FSM`s or `behavior trees` or a hybrid of the two at a later time.
+
+---
 
 One big advantage of a state machine is that it can be easily visualized and reasoned about using simple boxes and arrows.
 
@@ -239,8 +251,237 @@ When designing a state machine for any purpose, I always start with a pencil and
 
 I highly recommend that, before trying to code up any state machine, you start by sketching out a simple diagram of it's design to make it easy to reason about as you implement it.
 
-<p align="center">
-  <img src="./imgs/ai_fsm_design.jpg" />
+<p align="center" style="font-size: 12px;">
+    <img src="./imgs/ai_fsm_design.jpg"/>
+    <!-- <br>Your caption goes here -->
 </p>
 
-refs: https://gameprogrammingpatterns.com/state.html
+Looking at the state machine diagram above, you can see that this `finite state machine`, named `MyPatrolFleeAgentFSM`, consists of `3 states`: 
+
+- MyPatrolState
+- MyFleeState
+- MyIdleState
+
+In the `MyPatrolState`, the agent will just patrol between a set of pre-defined points (already setup in the previous tutorial section).
+
+In the `MyFleeState`, the agent will `flee` from a `target`.  In this case, the target will be a `player-controlled entity`.
+
+In the `MyIdleState`, the agent will not execute any `steering behaviors`, but may slowly glide to a stop and wait there for as long as the state is active.
+
+The `entry point` to the state machine, or `initial state`, is set to be the `MyPatrolState`, as indicated by the `PsyanimScene::create()` method pointing to it.
+
+Between the `states` on the diagram, we have `arrows` indicating the `allowed transitions` from each state to other states.
+
+We could've drawn the diagram a bit larger so as to include a small `transition condition` to be written next to each arrow.
+
+For now, let's just discuss the general flow of state changes in this state machine with a few bullet points here:
+
+- Agent starts out in the initial state of `MyPatrolState`, where the agent will be patrolling along a set of pre-defined points in the world.
+
+- When the `player-controlled entity` gets within a certain distance of the agent, it will transition to the `MyFleeState` where it will quickly accelerate away from the `player-controlled entity`.
+
+- When the `player-controlled-entity` is far enough away from the `agent` entity, the `agent` will transition to the `MyIdleState`.
+
+- In the `MyIdleState`, the `agent` waits a period of time before attempting to transition back to the `MyPatrolState`.  If, while waiting, the `player-controlled entity` gets too close to the `agent` entity, the `agent` will transition back to the `MyFleeState`.
+
+In this `MyPatrolFleeAgentFSM` state machine, the agent is always in one, and only one, of these 3 states.
+
+---
+
+To make this work in practice, we'll need to create these three states, define the agent behaviors in each one, as well as defining the conditions for allowed transitions between them.
+
+Luckily, `psyanim-cli` can be used to setup all the boiler plate we need to build our `state machine`.
+
+First, however, let's add a `player-controlled entity` to our `scene definition`, and add a few extra components to our `agent` entity to allow it to execute a `flee behavior` too.
+
+Adding the `player-controlled entity` to our `entities` array in the `scene definition` is as simple as:
+
+```js
+...
+{
+    name: 'player',
+    initialPosition: { x: 400, y: 550 },
+    shapeParams: {
+        shapeType: PsyanimConstants.SHAPE_TYPE.TRIANGLE,
+        color: 0xff0000,
+        base: 12, altitude: 20
+    },
+    components: [
+        {
+            type: PsyanimPlayerController
+        }
+    ]
+},
+...
+```
+
+Now, we just need to add a `PsyanimFleeBehavior` and `PsyanimFleeAgent` component to our `agent` entity so it is able to execute a `flee behavior` when needed:
+
+```js
+...
+{
+    type: PsyanimFleeBehavior,
+    params: {
+        maxSpeed: 8,
+        maxAcceleration: 0.3,
+        panicDistance: 150
+    }
+},
+{
+    type: PsyanimFleeAgent,
+    enabled: false,
+    params: {
+        fleeBehavior: {
+            entityName: 'agent',
+            componentType: PsyanimFleeBehavior
+        },
+        vehicle: {
+            entityName: 'agent',
+            componentType: PsyanimVehicle
+        },
+        target: {
+            entityName: 'player'
+        }
+    }
+},
+...
+```
+
+Notice that, in the above snippet, the `PsyanimFleeAgent` component has it's `enabled` property set to `false`.  This is because it would conflict with the `PsyanimPathFollowingAgent` if we had them both enabled simultaneously.
+
+So, we disable the `PsyanimFleeAgent` to start out, and our `PsyanimFSM`, will be responsible for switching between the `PsyanimFleeAgent` and the `PsyanimPathfollowingAgent` behaviors as appropriate later at runtime.
+
+By this point, if you reload the experiment in your browser, you should see two agents: a `red` player-controlled agent and `blue` AI-controlled agent.
+
+You should be able to move the `red` player-controlled agent around in the scene using the `W`, `S`, `A`, and `D` keys.
+
+However, if you move the `player-controlled agent` into the `AI-controlled agent`, the AI controlled agent doesn't flee and the two entities just collide.
+
+This is not what we want.  So, let's build out our `finite state machine` to give the `AI-controlled agent` the `decision-making` logic necessary to switch between behaviors as desired.
+
+---
+
+Run the following command in terminal to create the 3 `states` of our `state machine`:
+
+```bash
+psyanim --fsmstate MyPatrolState,MyIdleState,MyFleeState
+```
+
+You should see 3 source files show up under the `/src` directory - one for each state.
+
+If you open up `MyIdleState.js`, you'll see that the state is a `javascript class` with a `contructor` and `3 methods`: `enter`, `exit`, and `run`.
+
+The `constructor` is only executed once when the state is first created to be added to the state machine.
+
+The `enter()` method is executed once every time the entity `enters` that state.
+
+The `exit()` method is executed once every time the entity `exits` that state.
+
+The `run(t, dt)` method is executed once every simulation frame, so long as the state is `active` (meaning the entity is currently in that state).
+
+All `state transitions` should be added in the `constructor` of the state class, since we only want to add these transitions *once* for each state machine.
+
+Every state machine maintains `state variables` that can be read / written via a set of APIs in the `PsyanimFSMState`.  These `state variables` can be used to trigger transitions.
+
+The general workflow for implementing a `PsyanimFSMState` is as follows:
+
+- Create the state using `psyanim-cli`
+- Add transition conditions based on `state-variable` values in the `constructor` of the state class
+- In `enter`, `exit`, and `run` methods, do any work and update `state variables` of the `state machine` as necessary, triggering state transitions when appropriate.
+
+---
+
+Go ahead and copy the raw contents of the finished source files for each state into your state files.  The links are:
+
+- [MyIdleState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/MyIdleState.js)
+- [MyFleeState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/MyFleeState.js)
+- [MyPatrolState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/MyPatrolState.js)
+
+Let's look at `MyIdleState.js` in greater detail.  At the end of the `constructor` you can see the transitions to the `MyFleeState` and `MyPatrolState` are added.
+
+Each call to `addTransition()` accepts 3 arguments:
+
+- The `type` of the state to transition to.
+- The name of the `state variable` the transition is based on
+- The `condition` on which the value of the variable will `trigger` a `transition`
+
+Next, take a look at the `enter()` and `run()` methods of our `MyIdleState` class.
+
+Notice the enter() method just sets a `state variable` and sets up some references to be used later in `run()`.
+
+In the `run()` method, a timer is updated which may or may not trigger a transition back to the `MyPatrolState`.  There is also a check to determine if the `agent` should transition to the `MyFleeState` based on proximity to the `player-controlled entity`.
+
+The `enter()` and `run()` methods of any state do not need to check `state variables` to `trigger` state transitions.  This happens automatically in the `PsyanimFSM` state machine.
+
+If you have time, as an exercise, check out all 3 states' source code and try to understand how the code there relates to what we see in our state machine diagram sketch from earlier.
+
+---
+
+The last thing we need to do is just create the `PsyanimFSM` component on the `agent` entity in our scene and add our states to it!
+
+To do this, we'll use create a `PsyanimPatrolFleeAgentFSM` component that enapsulates the state machine creation.  Back in the terminal, run:
+
+```bash
+psyanim -c MyPatrolFleeAgentFSM
+```
+
+Open up the `MyPatrolFleeAgentFSM.js` and copy the following contents into it:
+
+```js
+import { 
+    PsyanimComponent,
+    
+    PsyanimFSM,
+
+} from 'psyanim2';
+
+import MyFleeState from './MyFleeState.js';
+import MyPatrolState from './MyPatrolState.js';
+import MyIdleState from './MyIdleState.js';
+
+export default class MyPatrolFleeAgentFSM extends PsyanimComponent {
+
+    constructor(entity) {
+
+        super(entity);
+
+        this._fsm = this.entity.addComponent(PsyanimFSM);
+
+        this._patrolState = this._fsm.addState(MyPatrolState);
+        this._fleeState = this._fsm.addState(MyFleeState);
+        this._idleState = this._fsm.addState(MyIdleState);
+
+        this._fsm.initialState = this._patrolState;
+    }
+}
+```
+
+All this component does is add the `PsyanimFSM` to the `agent` entity and then add our 3 states to the `this._fsm` state machine.
+
+Then, the last crucial step is to set the `initial state` of the `state machine` to the `MyPatrolState`.
+
+Let's add this component to our `HelloAIScene` definition by first importing it at the top of the file and adding this `component definition` to the `agent` entity:
+
+```js
+{
+    type: MyPatrolFleeAgentFSM,
+}
+```
+
+Reload your `experiment` in the `browser` and you should see the `agent` entity `patrolling`, `fleeing` when you approach it too closely, and then waiting in an `idle state` for some time before attempting to return to a `patrol`.
+
+Open your `browser console` to see that the state machine is displaying all the states and transitions automagically for you - this debug information didn't require any extra code or boilerplate as it's all part of the `PsyanimFSM` class out-of-the-box.
+
+As you interact with the `AI agent` using your `player-controlled agent`, check to see that these `transitions` logged in the `browser console` make sense to you.
+
+---
+
+In this tutorial, we've created an `AI agent` for an `interactive experiment` that uses a `finite state machine` to decide which steering behaviors to execute at any given moment.
+
+This is only a simple example of what's possible with the `Psyanim Decision-Making Framework` and `steering behavior` library.
+
+The next step is to design your own `agent` behaviors! Try to create an `agent` that aggressively seeks the `player-controlled entity` when it gets too close, and then gives up after a certain distance from it's patrol path.
+
+Think about how you could do this with a `PsyanimFSM` that executes an `arrive behavior` on the `player-controlled entity` in a certain `state` and what the `transition conditions` to return to patrolling might look like.
+
+Remember, you can always return to the resources listed in the `references` section above as needed for more advanced study, too.
