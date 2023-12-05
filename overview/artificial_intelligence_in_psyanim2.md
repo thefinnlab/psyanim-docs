@@ -229,13 +229,13 @@ The `*Behavior` components do *not* apply steering forces to the `PsyanimVehicle
 
 The `*Agent` components are responsible for querying the `*Behavior` components for steering forces and then deciding how those steering forces get applied to the `PsyanimVehicle` each frame.
 
-This separation of concerns allows for `*Behavior` components to be *reused* in other `*Behavior`s or `*Agents`.
+This separation of concerns allows for `*Behavior` components to be *reused* in other `*Behaviors` or `*Agents`.
 
 ## 4. Finite State Machines in Psyanim 2
 
 In order to give the `agent` entity the ability to switch between behaviors, or `make decisions`, based on the state of the world, we need some sort of a structure or pattern to define the logic for these decisions.
 
-Prior the advent of [behavior trees](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control), the structure commonly used in video games for `agent decision-making` was `finite state machines`.
+Prior the advent of [behavior trees](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control)), the structure commonly used in video games for `agent decision-making` was `finite state machines`.
 
 While `behavior trees` have certainly become the de facto standard for most games today due to their flexibility and ease of reuse, they are often still combined with `finite state machines` to produce even more sophisticated behaviors.
 
