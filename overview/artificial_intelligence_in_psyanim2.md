@@ -147,9 +147,9 @@ Next, we'll want to add a `PsyanimArriveBehavior` component:
 
 Don't worry too much about the parameters for the `PsyanimArriveBehavior` here, as those were tuned just to make the motion for this example look nice, but aren't critical to a general understanding of the `steering architecture`.
 
-The `PsyanimArriveBehavior` component is responsible for calculating `steering forces` for an `entity`.
+The `PsyanimArriveBehavior` component is responsible for *calculating* `steering forces` for an `entity`.
 
-The `PsyanimArriveBehavior` is *not* responsible applying these `steering forces` each frame.  
+The `PsyanimArriveBehavior` is *not* responsible for *applying* these `steering forces` each frame.  
 
 This separation of concerns is critical to note because these basic `steering behaviors` are designed to be used as building blocks to form more complex behaviors, which will switch between different simpler steering behaviors at runtime.
 
