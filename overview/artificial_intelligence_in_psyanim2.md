@@ -1,4 +1,4 @@
-# Artificial Intelligence in Psyanim-2
+# <ins>Artificial Intelligence in Psyanim-2</ins>
 
 ***Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2) in the `artificial_intelligence` branch.***
 

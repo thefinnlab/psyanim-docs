@@ -6,3 +6,4 @@
 * [JsPsych Integration](/overview/jspsych_integration.md "JsPsych Integration")
 * [Artificial Intelligence](/overview/artificial_intelligence_in_psyanim2.md)
 ---
+* [Database Schema](/overview/database_schema.md "Database Schema")

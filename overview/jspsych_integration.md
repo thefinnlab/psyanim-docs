@@ -1,4 +1,4 @@
-# Psyanim 2.0: jsPsych Integration Tutorial
+# <ins>Psyanim 2.0: jsPsych Integration Tutorial</ins>
 
 ***Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2) in the `psyanim-jspsych-integration` branch.***
 
@@ -365,7 +365,7 @@ There are various types of data that can be persisted in firebase, each with its
 - `session-logs`: This is the output of any `PsyanimDebug.log()`, `PsyanimDebug.warn()` or `PsyanimDebug.error()` statements called during the experiment.
 - `state-logs`: This is the state information (states/transitions + times) for any agent running a particular state-machine for a behavior, within the `Psyanim Decision-Making Framework`
 
-You can check out the [database schema](TODO://broken-link) to see more details on the structure and relationships of each of these collections.
+You can check out the [database schema](/overview/database_schema.md) to see more details on the structure and relationships of each of these collections.
 
 For now, just know that these exist and the data recorded in each of them is highly configurable per-trial via the and `PsyanimJsPsychTrial` interfaces.
 
