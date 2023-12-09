@@ -2,7 +2,7 @@
 
 ## 1. Overview of Psyanim Database Schema
 
-`Psyanim 2` is designed primarily for online `psychology` and `cognitive science` experiemnts, so an important part of each experiment is data gathering and recording.
+`Psyanim 2` is designed primarily for online `psychology` and `cognitive science` experiments, so an important part of each experiment is data gathering and recording.
 
 As `PsyanimApp` is responsible solely for simulating and rendering the 2D scenes we create, all of the data gathering and recording responsibilities are handled by the `PsyanimJsPsychPlugin`.
 
