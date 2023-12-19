@@ -697,4 +697,4 @@ Reload your scene in the browser and you should now see that this `MyArriveAgent
 
 In this section, we saw how `Entity Prefabs` allow us to reuse existing combinations of `components` to instantiate `entities` in different `scenes` without having to wire up and configure all the `components` manually every time, and they will also often expose a simpler set of `parameters` via the `prefab` interface.
 
-`Psyanim 2.0` has a growing library of `prefabs` you can leverage in your experiments, so check out the [API docs](https://github.com/thefinnlab/psyanim-api-docs) to see what's there.
+`Psyanim 2.0` has a growing library of `prefabs` you can leverage in your experiments, so check out the API docs in the `psyanim-2` repo on github to see what's there.
