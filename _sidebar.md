@@ -7,3 +7,5 @@
 * [Artificial Intelligence](/overview/artificial_intelligence_in_psyanim2.md)
 ---
 * [Database Schema](/overview/database_schema.md "Database Schema")
+---
+* [Playfight v2 Algorithm](/overview/playfight_v2_fsm_design.md "Playfight v2 Algorithm")
