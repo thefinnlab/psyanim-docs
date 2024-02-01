@@ -42,39 +42,21 @@ When building experiments using [jsPsych](https://www.jspsych.org/), we can run 
 
 ***You'll need to make sure you have read access to our psyanim-2 and psyanim-cli private git repos***
 
-Create a directory named 'hello-psyanim2' and navigate to it in your terminal.
-
-Create a new npm project with:
-
-```bash
-npm init -y
-```
-
-Install psyanim-2 package from the git repo via npm with:
-
-```bash
-npm install git+https://github.com/thefinnlab/psyanim-2.git
-```
-
-Install psyanim-cli package globally from git repo via npm with:
+Install psyanim-cli package globally from git repo via npm with the following command:
 
 ```bash
 npm install -g git+https://github.com/thefinnlab/psyanim-cli.git
 ```
 
-Create a new Psyanim-2 project with psyanim-cli by running the following command from the root of your project directory:
+Create a directory named `hello-psyanim2` and navigate to it in your terminal.
+
+Create a new `psyanim-2` experiment project with:
 
 ```bash
-psyanim --init
+psyanim init
 ```
 
-Let's go ahead and initialize a git repository and commit what we have so far!
-
-```bash
-git init
-git add .
-git commit -m "created my first psyanim experiment!"
-```
+`psyanim init` will create a new git repository containing a blank `psyanim-2` experiment project.
 
 At this stage, we have an experiment with just one empty scene.  Let's add another scene.
 
@@ -85,17 +67,17 @@ Let's get familiar with `Psyanim Scenes`, `Psyanim Entities` and `Psyanim Compon
 Back in the terminal, run the following command to create a scene named 'MyFirstScene':
 
 ```bash
-psyanim --scene MyFirstScene
+psyanim asset:scene MyFirstScene -o ./src/scenes
 ```
 
-You should see `MyFirstScene.js` show up under `./src/`.
+You should see `MyFirstScene.js` show up under `./src/scenes`.
 
 Let's add this new scene to our `index.js` file.
 
 Open `index.js` and add the following import to the top of the file:
 
 ```js
-import MyFirstScene from './MyFirstScene.js';
+import MyFirstScene from './scenes/MyFirstScene.js';
 ```
 
 We can also delete all commented-out code and unused imports - they are only there as an example of how to setup features we won't discuss right now.
@@ -112,10 +94,10 @@ timeline.push(myFirstSceneTrial.jsPsychTrialDefinition);
 Next, `using psyanim-cli` let's create a `MyFirstMovementComponent` to add to an `entity` in our `scene`, which will move the `entity` back and forth on the screen:
 
 ```bash
-psyanim --component MyFirstMovementComponent
+psyanim asset:component MyFirstMovementComponent -o ./src/components
 ```
 
-Open up `MyFirstMovementComponent.js` under the `/src` directory and replace it's contents with the following:
+Open up `MyFirstMovementComponent.js` under the `/src/components` directory and replace it's contents with the following:
 
 ```js
 import Phaser from 'phaser';
@@ -173,7 +155,7 @@ Open up `MyFirstScene.js` under your `/src` directory and replace it's contents 
 ```js
 import { PsyanimConstants } from 'psyanim2';
 
-import MyFirstMovementComponent from './MyFirstMovementComponent.js';
+import MyFirstMovementComponent from '../components/MyFirstMovementComponent.js';
 
 export default {
     key: 'MyFirstScene',
@@ -230,10 +212,10 @@ We'll create a scene with a player-controlled agent as well as an agent controll
 In your terminal, run the following command to create your new scene:
 
 ```bash
-psyanim -s InteractiveEvadeAgent
+psyanim asset:scene InteractiveEvadeAgent -o ./src/scenes
 ```
 
-You should see `InteractiveEvadeAgent.js` show up in your `/src` directory.  Open this file up and you should see the following:
+You should see `InteractiveEvadeAgent.js` show up in your `/src/scenes` directory.  Open this file up and you should see the following:
 
 ```js
 import { PsyanimConstants } from 'psyanim2';
@@ -382,7 +364,7 @@ The first thing we'll do is add two `entities` to our scene: one that follows th
 To do this, let's navigate to our project in a terminal and run the following command to create our new scene:
 
 ```bash
-psyanim -s MyArriveScene
+psyanim asset:scene MyArriveScene -o ./src/scenes
 ```
 
 Be sure to add this scene to a new trial in your `index.js`.
@@ -597,7 +579,7 @@ Remember that this is a smaller, simpler contrived example, and some prefabs, su
 Let's start by creating a new scene to work in.  In your terminal, navigate to your project directory and run the command:
 
 ```bash
-psyanim --scene MyArriveAgentPrefabScene
+psyanim asset:scene MyArriveAgentPrefabScene -o ./src/scenes
 ```
 
 As in the previous sections, add this scene to a new `jsPsych trial` in your `index.js`.

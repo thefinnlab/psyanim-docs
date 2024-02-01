@@ -69,7 +69,7 @@ Let's get started by creating a new, empty `psyanim2` project using `psyanim-cli
 Let's create an new scene with `psyanim-cli`:
 
 ```bash
-psyanim -s HelloAIScene
+psyanim asset:scene HelloAIScene -o ./src/scenes
 ```
 
 You can delete the `EmptyScene.js`, remove all the commented out code from the `index.js` and add a trial for `HelloAIScene.js` to it.
@@ -364,10 +364,10 @@ This is not what we want.  So, let's build out our `finite state machine` to giv
 Run the following command in terminal to create the 3 `states` of our `state machine`:
 
 ```bash
-psyanim --fsmstate MyPatrolState,MyIdleState,MyFleeState
+psyanim asset:fsmstate MyPatrolState MyIdleState MyFleeState -o ./src/patrolfsm
 ```
 
-You should see 3 source files show up under the `/src` directory - one for each state.
+You should see 3 source files show up under the `/src/patrolfsm` directory - one for each state.
 
 If you open up `MyIdleState.js`, you'll see that the state is a `javascript class` with a `contructor` and `3 methods`: `enter`, `exit`, and `run`.
 
@@ -422,7 +422,7 @@ The last thing we need to do is just create the `PsyanimFSM` component on the `a
 To do this, we'll use create a `PsyanimPatrolFleeAgentFSM` component that enapsulates the state machine creation.  Back in the terminal, run:
 
 ```bash
-psyanim -c MyPatrolFleeAgentFSM
+psyanim asset:component MyPatrolFleeAgentFSM -o ./src/patrolfsm
 ```
 
 Open up the `MyPatrolFleeAgentFSM.js` and copy the following contents into it:

@@ -69,8 +69,8 @@ To start, create a new empty Psyanim 2 project, following the same steps as the 
 Using `psyanim-cli`, let's create a new `scene` called `WanderScene` and a new `component` called `MyCustomDebugger`:
 
 ```bash
-psyanim --scene WanderScene
-psyanim --component MyCustomDebugger
+psyanim asset:scene WanderScene -o ./src/scenes
+psyanim asset:component MyCustomDebugger -o ./src/components
 ```
 
 ---
@@ -530,7 +530,7 @@ For this, `psyanim-cli` is just the tool for the job, as it has a feature to run
 In the root of your `Experiment Viewer` project, run the following command:
 
 ```bash
-psyanim --query ./sample_firestore_queries/listCollections.js
+psyanim firebase:query ./sample_firestore_queries/listCollections.js
 ```
 
 You should've seen the following output:
@@ -634,7 +634,7 @@ To see how to filter the data presented by `experiment viewer`, let's create a c
 Let's create a new custom data provider mdoule using `psyanim-cli`:
 
 ```bash
-psyanim --dataprovider myCustomDataProvider.js
+psyanim asset:dataprovider MyCustomDataProvider -o ./dataproviders
 ```
 
 Replace the body of the function with the following query:
@@ -666,7 +666,7 @@ Here, you'll see a `.where()` method in which we specify that we only want to se
 To run `Psyanim Experiment Viewer` with our new custom query module, the command line syntax is:
 
 ```bash
-npm run serve ./src/myCustomDataProvider.js
+npm run serve ./dataproviders/MyCustomDataProvider.js
 ```
 
 After running the server with this new `dataProvider` module, reload the app in your browser and you should only see scenes where the `sceneKey` is 'Wander Scene`.
@@ -738,7 +738,7 @@ For now, however, we will work with the `2-experiments-5-users` dataset for our 
 To run this script, use `psyanim-cli`:
 
 ```bash
-psyanim -q ./sample_firestore_queries/restoreCloudDB.js
+psyanim firebase:query ./sample_firestore_queries/restoreCloudDB.js
 ```
 
 You should now have all of the data from the `2-experiments-5-users` directory in your `firestore cloud database`.
@@ -772,7 +772,7 @@ Let's create a new `Trial Collection File` that only contains `trial metadata` f
 Create a new `data provider` module for `Experiment Viewer` with the following command:
 
 ```bash
-psyanim -d myDataProviderUserC
+psyanim asset:dataprovider MyDataProviderUserC -o ./dataproviders
 ```
 
 Open this file up and replace the body of the `dataProvider()` function with:
@@ -796,7 +796,7 @@ export function dataProvider(firebaseClient, dataHandler) {
 Now let's start the `Psyanim Experiment Viewer` with the following command (may need to kill the old instance if you didn't already):
 
 ```bash
-npm run serve ./src/myDataProviderUserC.js
+npm run serve ./dataproviders/MyDataProviderUserC.js
 ```
 
 If you peek through all the trials presented by `Experiment Viewer`, you'll see there are only trials for `UserC` now.
