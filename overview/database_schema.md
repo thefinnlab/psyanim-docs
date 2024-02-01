@@ -276,3 +276,38 @@ An example of this data looks like:
     }
 }
 ```
+
+## 6. Expected Database Size and Transaction Costs for An Experiment
+
+Google Firebase Firestore databases charge for document reads, writes and deletes.  Thus, when estimating the cost of running an experiment, it is helpful to have an idea of how many document reads and writes will be done per experiment.
+
+During experiment using the `PsyanimJsPsychPlugin` or the `PsyanimJsPsychDataWriterExtension`, no documents are ever deleted, so we will not consider document deletions here.
+
+To minimize the cost of running an experiment, we simply need to know the number of documents read and written.
+
+Psyanim 2 is very configurable, so there are many factors which affect how much data it consumes and generates for a given experiment.
+
+In the tables below, you'll find the relevant document types and rates at which they are read / written.
+
+Here is the data that gets `written` to the database for every experiment:
+
+| Document Type | Number | Optional? | Other Notes |
+| ------------- | ---------------- | ----------------- | ----------- |
+| Trial Metadata | 1 Per Trial | No | |
+| Animation Clip | 1 Per Agent Per Trial | Yes | |
+| Agent State Log | 1 Per Agent Per Trial | Yes | |
+| Session Logs | 1 Per `Experiment` | Yes | There is only 1 doc per experiment that each trial writes to, with buffered writes that get flushed to firestore at a configurable frequency |
+| JsPsych Experiment Data | 1 Per `Experiment` | Yes | There is only 1 doc per experiment that each trial writes to, but the write takes place for every trial that uses the `PsyanimJsPsychDataWriterExtension` |
+
+Here is the data that gets `read` in from the database for every trial:
+
+| Document Type | Optional? | Other Notes |
+| ------------- | ------------ | ----------- |
+| Trial Metadata | Yes | The PsyanimJsPsychTrialLoader uses trial collection files to determine how many trials to read from firebase |
+| Animation Clip | Yes | For every trial-metadata doc configured in trial collection files, the PsyanimJsPsychTrial Loader will load every associated animation clip, 1 per agent |
+
+It's also important to note that the `Psyanim Experiment Viewer` uses `data providers` to determine what data to pull from firebase firestore for visualization purposes.
+
+By default, it will pull all trial documents in the `trial-metadata` collection.  This can result in an enormous amount of reads in a single `experiment viewer` session.
+
+To limit the amount of data `Psyanim Experiment Viewer` reads from the database for each session, it's important to use a custom data-provider with server-side queries, so filtering is done on server-side rather than pulling all data to client to filter there.  More info on this can be found [here](/overview/jspsych_integration.md#_10-custom-queries-with-psyanim-cli).
