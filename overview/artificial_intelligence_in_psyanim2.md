@@ -241,7 +241,14 @@ While `behavior trees` have certainly become the de facto standard for most game
 
 `Psyanim 2`'s decision-making framework offers `finite state machines` (or *FSMs*) via the `PsyanimFSM` and `PsyanimFSMState` classes.
 
-While `PsyanimFSM` does not support `hierarchical FSMs` at the moment, the framework can always be extended with `heirarchical FSM`s or `behavior trees` or a hybrid of the two at a later time.
+While `psyanim2` does not have full support for `hierarchical FSMs` at the moment, it does support a simpler version as described by Ian Millington in his book `Artificial Intelligence for Games`:
+
+> An implementation of hierarchical state machines could be made significantly simpler than this by requiring that transitions can only occur between states at the same level. With this limitation in force, all the recursion code can be eliminated.
+> If you don’t need crosshierarchy transitions, then the simpler version will be easier to implement. 
+
+This simpler hierarchical FSM, called `PsyanimBasicHFSM`, is implemented similar to [pushdown automata](https://en.wikipedia.org/wiki/Pushdown_automaton), but with entire sub-state machines rather than just states, so a 'history' of states is automatically kept internally in the underlying stack data structure and the hierarchy is enforced by position within the stack.
+
+That said, `psyanim2` can always be extended with full-featured `heirarchical FSMs` or `behavior trees` (or a hybrid of the two) at a later time should the need arise.
 
 ---
 
@@ -252,39 +259,36 @@ When designing a state machine for any purpose, I always start with a pencil and
 I highly recommend that, before trying to code up any state machine, you start by sketching out a simple diagram of it's design to make it easy to reason about as you implement it.
 
 <p align="center" style="font-size: 12px;">
-    <img src="./imgs/ai_fsm_design.jpg"/>
+    <img src="./imgs/item_patrol_fsm.jpg"/>
     <!-- <br>Your caption goes here -->
 </p>
 
-Looking at the state machine diagram above, you can see that this `finite state machine`, named `MyPatrolFleeAgentFSM`, consists of `3 states`: 
+Looking at the state machine diagram above, you can see that this `finite state machine`, named `MyItemPatrolFSM`, consists of `2 states`: 
 
 - MyPatrolState
-- MyFleeState
-- MyIdleState
+- MyMoveToItemState
+
+The primary task of this state machine is to have an agent patrol along a fixed path until an item appears in the scene, at which point it will move to the item to collect it, after which it will return to it's patrol until another item appears.
 
 In the `MyPatrolState`, the agent will just patrol between a set of pre-defined points (already setup in the previous tutorial section).
 
-In the `MyFleeState`, the agent will `flee` from a `target`.  In this case, the target will be a `player-controlled entity`.
+In the `MyMoveToItemState`, the agent will move to an item's location in the scene to collect it when it appears.
 
-In the `MyIdleState`, the agent will not execute any `steering behaviors`, but may slowly glide to a stop and wait there for as long as the state is active.
-
-The `entry point` to the state machine, or `initial state`, is set to be the `MyPatrolState`, as indicated by the `PsyanimScene::create()` method pointing to it.
+The `entry point` to the state machine, or `initial state`, is set to be the `MyPatrolState`.
 
 Between the `states` on the diagram, we have `arrows` indicating the `allowed transitions` from each state to other states.
 
-We could've drawn the diagram a bit larger so as to include a small `transition condition` to be written next to each arrow.
+The `circled numbers` next to each `arrow` on the diagram represent `transition conditions`, each of which are detailed below the diagram.
 
 For now, let's just discuss the general flow of state changes in this state machine with a few bullet points here:
 
 - Agent starts out in the initial state of `MyPatrolState`, where the agent will be patrolling along a set of pre-defined points in the world.
 
-- When the `player-controlled entity` gets within a certain distance of the agent, it will transition to the `MyFleeState` where it will quickly accelerate away from the `player-controlled entity`.
+- When an item appears in the scene, the agent transitions to the `MyMoveToItemState` to collect the item.
 
-- When the `player-controlled-entity` is far enough away from the `agent` entity, the `agent` will transition to the `MyIdleState`.
+- Once the item is collected, the agent transitions back to the `MyPatrolState` until another item appears in the scene.
 
-- In the `MyIdleState`, the `agent` waits a period of time before attempting to transition back to the `MyPatrolState`.  If, while waiting, the `player-controlled entity` gets too close to the `agent` entity, the `agent` will transition back to the `MyFleeState`.
-
-In this `MyPatrolFleeAgentFSM` state machine, the agent is always in one, and only one, of these 3 states.
+As with all state machines in general, in this `MyPatrolFleeAgentFSM` state machine, the agent is always in one, and only one, of these 2 states.
 
 ---
 
@@ -473,6 +477,34 @@ Reload your `experiment` in the `browser` and you should see the `agent` entity 
 Open your `browser console` to see that the state machine is displaying all the states and transitions automagically for you - this debug information didn't require any extra code or boilerplate as it's all part of the `PsyanimFSM` class out-of-the-box.
 
 As you interact with the `AI agent` using your `player-controlled agent`, check to see that these `transitions` logged in the `browser console` make sense to you.
+
+## 5. Hierarchical FSM Example
+
+<p align="center" style="font-size: 12px;">
+    <img src="./imgs/flee_fsm.jpg"/>
+    <!-- <br>Your caption goes here -->
+</p>
+
+In the `MyFleeState`, the agent will `flee` from a `target`.  In this case, the target will be a `player-controlled entity`.
+
+In the `MyIdleState`, the agent will not execute any `steering behaviors`, but may slowly glide to a stop and wait there for as long as the state is active.
+
+...
+
+...general flow of this state machine:
+
+...
+
+- When the `player-controlled entity` gets within a certain distance of the agent, it will transition to the `MyFleeState` where it will quickly accelerate away from the `player-controlled entity`.
+
+- When the `player-controlled-entity` is far enough away from the `agent` entity, the `agent` will transition to the `MyIdleState`.
+
+- In the `MyIdleState`, the `agent` waits a period of time before attempting to transition back to the `MyPatrolState`.  If, while waiting, the `player-controlled entity` gets too close to the `agent` entity, the `agent` will transition back to the `MyFleeState`.
+
+<p align="center" style="font-size: 12px;">
+    <img src="./imgs/basic_hfsm.jpg"/>
+    <!-- <br>Your caption goes here -->
+</p>
 
 ---
 
