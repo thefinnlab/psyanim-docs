@@ -38,15 +38,17 @@ When building experiments using [jsPsych](https://www.jspsych.org/), we can run 
 
 ## 2. Creating a new Psyanim 2 Project
 
-***Pre-requisites: Requires NodeJS v18.16.0 or higher.***
+***Pre-requisites: Requires [NodeJS](https://nodejs.org/en) v18.16.0+, an up-to-date installation of [Git](https://git-scm.com/), and [Psyanim-CLI](https://github.com/thefinnlab/psyanim-cli.git) installed globally.***
 
 ***You'll need to make sure you have read access to our psyanim-2 and psyanim-cli private git repos***
 
-Install psyanim-cli package globally from git repo via npm with the following command:
+If not installed already, you can install psyanim-cli package globally from git repo via npm with the following command:
 
 ```bash
 npm install -g git+https://github.com/thefinnlab/psyanim-cli.git
 ```
+
+---
 
 Create a directory named `hello-psyanim2` and navigate to it in your terminal.
 

@@ -50,7 +50,7 @@ The course is a comprehensive overview of all forms of AI used in Psyanim-2, and
 
 This book and video lecture series is one of the best introductions to AI steering behaviors I've seen, and though it's built on a different real-time graphics framework, the algorithms are implemented in javascript in a very pseudo-code-esque fashion that makes it easy to translate to Psyanim-2 or Phaser.
 
-Here's a link to the [book](https://natureofcode.com/book/chapter-6-autonomous-agents/).
+Here's a link to the [book](https://natureofcode.com/autonomous-agents/).
 
 Here's a link to the [video lectures](https://youtu.be/P_xJMH8VvAE?si=XOgqMA1L8bJlxea2).
 
@@ -58,11 +58,11 @@ Here's a link to the [video lectures](https://youtu.be/P_xJMH8VvAE?si=XOgqMA1L8b
 
 ***NOTE: this tutorial assumes some familiarity with the `Seek` steering behavior, as the `Arrive` behavior is just a variant of that.  For more information, see the previous section.***
 
-In this section, we'll get some hands-on experience with the `steering architecture` in `Psyanim 2` by designing an `interactive scene` with an `AI agent` and a `player-controlled agent`.
+In this section, we'll get some hands-on experience with the `steering architecture` in `Psyanim 2` by designing an with an `AI agent`.
 
-The `AI agent` will `patrol` back and forth between a few points in the world, and when approached by the `player-controlled agent`, the `AI agent` will `flee` from it, waiting for some time at a certain distance away before attempting to return back to it's `patrol`.
+The `AI agent` we'll create will `patrol` back and forth between a few points in the world.
 
-We will give the AI agent a 'brain' later to decide how to switch between behaviors (known as `decision-making` in game AI), but for this section, let's just get the AI agent patrolling between a few points using a `pathfollowing` steering behavior, so we can learn a bit about the `steering architecture` in general.
+We will give the AI agent a 'brain' later to decide how to switch between different behaviors (known as `decision-making` in game AI) depending on what's happening in the environment, but for this section, let's just get the AI agent patrolling between a few points using a `pathfollowing` steering behavior, so we can learn a bit about the `steering architecture` in general.
 
 Let's get started by creating a new, empty `psyanim2` project using `psyanim-cli` as we did in the [Hello Psyanim 2.0 tutorial](/overview/hello_psyanim_2.md#2-creating-a-new-psyanim-2-project).
 
@@ -86,15 +86,11 @@ Update your `psyanim2` package imports at the top so they include the following 
 import { 
     
     PsyanimConstants,
-    PsyanimPlayerController,
 
     PsyanimVehicle,
     PsyanimArriveBehavior,
     PsyanimArriveAgent,
     PsyanimPathFollowingAgent,
-
-    PsyanimFleeBehavior,
-    PsyanimFleeAgent
 
 } from 'psyanim2';
 ```
@@ -241,6 +237,10 @@ While `behavior trees` have certainly become the de facto standard for most game
 
 `Psyanim 2`'s decision-making framework offers `finite state machines` (or *FSMs*) via the `PsyanimFSM` and `PsyanimFSMState` classes.
 
+One big advantage of a state machine is that it can be easily visualized and reasoned about using simple boxes and arrows.
+
+The fact that state machines lend themselves so easily to clear visual representations means that subject-matter experts can participate in AI design, regardless of their level of comfort with programming.
+
 While `psyanim2` does not have full support for `hierarchical FSMs` at the moment, it does support a simpler version as described by Ian Millington in his book `Artificial Intelligence for Games`:
 
 > An implementation of hierarchical state machines could be made significantly simpler than this by requiring that transitions can only occur between states at the same level. With this limitation in force, all the recursion code can be eliminated.
@@ -251,8 +251,6 @@ This simpler hierarchical FSM, called `PsyanimBasicHFSM`, is implemented similar
 That said, `psyanim2` can always be extended with full-featured `heirarchical FSMs` or `behavior trees` (or a hybrid of the two) at a later time should the need arise.
 
 ---
-
-One big advantage of a state machine is that it can be easily visualized and reasoned about using simple boxes and arrows.
 
 When designing a state machine for any purpose, I always start with a pencil and a piece of paper, sketching out the `states` represented by `boxes` and `allowed transitions` represented by `arrows`.
 
@@ -288,13 +286,167 @@ For now, let's just discuss the general flow of state changes in this state mach
 
 - Once the item is collected, the agent transitions back to the `MyPatrolState` until another item appears in the scene.
 
-As with all state machines in general, in this `MyPatrolFleeAgentFSM` state machine, the agent is always in one, and only one, of these 2 states.
+As with all state machines in general, in this `MyItemPatrolFSM` state machine, the agent is always in one, and only one, of these 2 possible states.
 
 ---
 
-To make this work in practice, we'll need to create these three states, define the agent behaviors in each one, as well as defining the conditions for allowed transitions between them.
+To make this work in practice, we'll need to create these two states, define the agent behaviors in each one, as well as defining the conditions for allowed transitions between them.
 
 Luckily, `psyanim-cli` can be used to setup all the boiler plate we need to build our `state machine`.
+
+---
+
+Run the following command in terminal to create the 3 `states` of our `state machine`:
+
+```bash
+psyanim asset:fsmstate MyPatrolState MyMoveToItemState -o ./src/basic_hfsm/item_patrol_fsm
+```
+
+You should see 2 source files show up under the `/src/basic_hfsm/item_patrol_fsm` directory - one for each state.
+
+If you open up `MyPatrolState.js`, you'll see that the state is a `javascript class` with a `contructor` and `5 methods`: `afterCreate`, `enter`, `exit`, `run`, `onResume`, and `onPause`.
+
+We can ignore the `onResume` and `onPause` methods for now, as they will be discussed in the next section.
+
+The `constructor` is only executed once when the state is first created to be added to the state machine.
+
+The `enter()` method is executed once every time the entity `enters` that state.
+
+The `exit()` method is executed once every time the entity `exits` that state.
+
+The `run(t, dt)` method is executed once every simulation frame, so long as the state is `active` (meaning the entity is currently in that state).
+
+All `state transitions` should be added in the `constructor` of the state class, since we only want to add these transitions *once* for each state machine.
+
+Every state machine maintains `state variables` that can be read / written via a set of APIs in the `PsyanimFSMState`.  These `state variables` can be used to trigger transitions.
+
+The general workflow for implementing a `PsyanimFSMState` is as follows:
+
+- Create the state using `psyanim-cli`
+- Add transition conditions based on `state-variable` values in the `constructor` of the state class
+- In `enter`, `exit`, and `run` methods, do any work and update `state variables` of the `state machine` as necessary, triggering state transitions when appropriate.
+
+---
+
+Go ahead and copy the raw contents of the finished source files for each state into your state files.  The links are:
+
+- [MyPatrolState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/item_patrol_fsm/MyPatrolState.js)
+- [MyMoveToItemState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/item_patrol_fsm/MyMoveToItemState.js)
+
+Let's look at `MyPatrolState.js` in greater detail.  At the end of the `constructor` you can see the transition to the `MyMoveToItemState` is added.
+
+Each call to `addTransition()` accepts 3 arguments:
+
+- The `type` of the state to transition to.
+- The name of the `state variable` the transition is based on
+- The `condition` on which the value of the variable will `trigger` a `transition`
+
+Next, take a look at the `enter()` and `run()` methods of our `MyPatrolState` class.
+
+Notice the `enter()` method just sets a `state variable`, enables & configures the `arrive agent` component, and then sets the entity's color to a value specific to this state (for visualization purposes).
+
+In the `run()` method, we query the current `PsyanimScene` object to see if there is an `item` in the scene.  If there is, we set the `itemInScene` state variable to `true`.
+
+The `enter()` and `run()` methods of any state do not need to explicitly check `state variables` to `trigger` state transitions.  This happens automatically in the `PsyanimFSM` state machine.
+
+If you have time, as an exercise, check out both states' source code and try to understand how the code there relates to what we see in our state machine diagram sketch from earlier.
+
+---
+
+The last thing we need to do is just create the `PsyanimFSM` component on the `agent` entity in our scene and add our states to it!
+
+To do this, we'll create a `MyItemPatrolFSM` component that encapsulates the state machine creation.  Back in the terminal, run:
+
+```bash
+psyanim asset:fsm MyItemPatrolFSM -o ./src/basic_hfsm/item_patrol_fsm
+```
+
+Let's open up the `MyItemPatrolFSM.js` and take a peek at's structure.
+
+Notice that `MyItemPatrolFSM` inherits from `PsyanimFSM`, which is itself a `PsyanimComponent`.
+
+All `PsyanimFSM` classes inherit a set of methods which can be overriden for different purposes, including: `afterCreate`, `onPause`, `onStop`, `onResume`, and `update`.
+
+The `afterCreate` and `update` methods are just overrides for the base `PsyanimComponent` methods.
+
+We will discuss `onPause`, `onStop` and `onResume` in the next section.  In fact, we can go ahead and remove them from this FSM since they won't be needed here.
+
+Go ahead and copy the finished source file into `MyPatrolFSM.js`:
+
+- [MyItemPatrolFSM.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/item_patrol_fsm/MyItemPatrolFSM.js)
+
+Notice the only two methods this `MyItemPatrolFSM` class implements are the `constructor` and `update`.
+
+In the `constructor`, we add our two states to the `MyItemPatrolFSM` and then set the `initial state`, which is the first state that will be active when the FSM starts up.
+
+In the `update` method of `MyItemPatrolFSM`, a `distanceToTarget` state variable is computed and set every frame.
+
+You can safely ignore this for now, as it will come in handy later. It is good to make note of how `state variables` can be set for an FSM, though.
+
+---
+
+Let's add this `MyItemPatrolFSM` component to our `HelloAIScene` definition by first importing it at the top of the file and adding this `component definition` to the `agent` entity:
+
+```js
+{
+    type: MyPatrolFleeAgentFSM,
+}
+```
+
+We'll also need to add a `PsyanimSensor` component to this `agent` entity, as the `MyMoveToItemState` expects the entity to have one attached.
+
+To do so, update the `psyanim2` import statement at the top of the `HelloAIScene` definition to also import `PsyanimSensor`.
+
+Then, add the following `component definition` to the `agent` entity:
+
+```js
+{
+    type: PsyanimSensor,
+    params: {
+        bodyShapeParams: {
+            shapeType: PsyanimConstants.SHAPE_TYPE.CIRCLE,
+            radius: 24                
+        }
+    }
+}
+```
+
+--- 
+
+So, we now have our FSM setup, but if you reload your experiment in the browser, the agent never leaves the `MyPatrolState`.
+
+This is because the `transition condition` for leaving that state is triggered by the condition that an `item` exists in the scene.
+
+To get an `item` to be added to the scene periodically, we'll create a `MyItemSpawner` component with `psyanim-cli`:
+
+```bash
+psyanim asset:component MyItemSpawner -o ./src/components
+```
+
+Open up `MyItemSpawner.js` and replace it's contents with the finished source code here:
+
+- [MyItemSpawner.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/components/MyItemSpawner.js)
+
+All this component does is add an `item` to our `scene` at a particular location with a particular frequency.
+
+Let's add this component to a new entity in our `HelloAIScene` definition's `entities array` using the following `entity definition` (be sure to import `MyItemSpawner.js` at the top of the file):
+
+```js
+{
+    name: 'itemSpawner',
+    components: [
+        {
+            type: MyItemSpawner
+        }
+    ]
+},
+```
+
+Reload your `experiment` in the `browser` and you should see the `agent` entity `patrolling` until an `item` is spawned in the scene, at which point it will `move to` that item to collect it before returning to it's original patrol.
+
+Great work - you've created your first `finite-state machine` in `psyanim-2`!
+
+## 5. Hierarchical FSM Example
 
 First, however, let's add a `player-controlled entity` to our `scene definition`, and add a few extra components to our `agent` entity to allow it to execute a `flee behavior` too.
 
@@ -363,122 +515,6 @@ However, if you move the `player-controlled agent` into the `AI-controlled agent
 
 This is not what we want.  So, let's build out our `finite state machine` to give the `AI-controlled agent` the `decision-making` logic necessary to switch between behaviors as desired.
 
----
-
-Run the following command in terminal to create the 3 `states` of our `state machine`:
-
-```bash
-psyanim asset:fsmstate MyPatrolState MyIdleState MyFleeState -o ./src/patrolfsm
-```
-
-You should see 3 source files show up under the `/src/patrolfsm` directory - one for each state.
-
-If you open up `MyIdleState.js`, you'll see that the state is a `javascript class` with a `contructor` and `3 methods`: `enter`, `exit`, and `run`.
-
-The `constructor` is only executed once when the state is first created to be added to the state machine.
-
-The `enter()` method is executed once every time the entity `enters` that state.
-
-The `exit()` method is executed once every time the entity `exits` that state.
-
-The `run(t, dt)` method is executed once every simulation frame, so long as the state is `active` (meaning the entity is currently in that state).
-
-All `state transitions` should be added in the `constructor` of the state class, since we only want to add these transitions *once* for each state machine.
-
-Every state machine maintains `state variables` that can be read / written via a set of APIs in the `PsyanimFSMState`.  These `state variables` can be used to trigger transitions.
-
-The general workflow for implementing a `PsyanimFSMState` is as follows:
-
-- Create the state using `psyanim-cli`
-- Add transition conditions based on `state-variable` values in the `constructor` of the state class
-- In `enter`, `exit`, and `run` methods, do any work and update `state variables` of the `state machine` as necessary, triggering state transitions when appropriate.
-
----
-
-Go ahead and copy the raw contents of the finished source files for each state into your state files.  The links are:
-
-- [MyIdleState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/MyIdleState.js)
-- [MyFleeState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/MyFleeState.js)
-- [MyPatrolState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/MyPatrolState.js)
-
-Let's look at `MyIdleState.js` in greater detail.  At the end of the `constructor` you can see the transitions to the `MyFleeState` and `MyPatrolState` are added.
-
-Each call to `addTransition()` accepts 3 arguments:
-
-- The `type` of the state to transition to.
-- The name of the `state variable` the transition is based on
-- The `condition` on which the value of the variable will `trigger` a `transition`
-
-Next, take a look at the `enter()` and `run()` methods of our `MyIdleState` class.
-
-Notice the enter() method just sets a `state variable` and sets up some references to be used later in `run()`.
-
-In the `run()` method, a timer is updated which may or may not trigger a transition back to the `MyPatrolState`.  There is also a check to determine if the `agent` should transition to the `MyFleeState` based on proximity to the `player-controlled entity`.
-
-The `enter()` and `run()` methods of any state do not need to check `state variables` to `trigger` state transitions.  This happens automatically in the `PsyanimFSM` state machine.
-
-If you have time, as an exercise, check out all 3 states' source code and try to understand how the code there relates to what we see in our state machine diagram sketch from earlier.
-
----
-
-The last thing we need to do is just create the `PsyanimFSM` component on the `agent` entity in our scene and add our states to it!
-
-To do this, we'll use create a `PsyanimPatrolFleeAgentFSM` component that enapsulates the state machine creation.  Back in the terminal, run:
-
-```bash
-psyanim asset:component MyPatrolFleeAgentFSM -o ./src/patrolfsm
-```
-
-Open up the `MyPatrolFleeAgentFSM.js` and copy the following contents into it:
-
-```js
-import { 
-    PsyanimComponent,
-    
-    PsyanimFSM,
-
-} from 'psyanim2';
-
-import MyFleeState from './MyFleeState.js';
-import MyPatrolState from './MyPatrolState.js';
-import MyIdleState from './MyIdleState.js';
-
-export default class MyPatrolFleeAgentFSM extends PsyanimComponent {
-
-    constructor(entity) {
-
-        super(entity);
-
-        this._fsm = this.entity.addComponent(PsyanimFSM);
-
-        this._patrolState = this._fsm.addState(MyPatrolState);
-        this._fleeState = this._fsm.addState(MyFleeState);
-        this._idleState = this._fsm.addState(MyIdleState);
-
-        this._fsm.initialState = this._patrolState;
-    }
-}
-```
-
-All this component does is add the `PsyanimFSM` to the `agent` entity and then add our 3 states to the `this._fsm` state machine.
-
-Then, the last crucial step is to set the `initial state` of the `state machine` to the `MyPatrolState`.
-
-Let's add this component to our `HelloAIScene` definition by first importing it at the top of the file and adding this `component definition` to the `agent` entity:
-
-```js
-{
-    type: MyPatrolFleeAgentFSM,
-}
-```
-
-Reload your `experiment` in the `browser` and you should see the `agent` entity `patrolling`, `fleeing` when you approach it too closely, and then waiting in an `idle state` for some time before attempting to return to a `patrol`.
-
-Open your `browser console` to see that the state machine is displaying all the states and transitions automagically for you - this debug information didn't require any extra code or boilerplate as it's all part of the `PsyanimFSM` class out-of-the-box.
-
-As you interact with the `AI agent` using your `player-controlled agent`, check to see that these `transitions` logged in the `browser console` make sense to you.
-
-## 5. Hierarchical FSM Example
 
 <p align="center" style="font-size: 12px;">
     <img src="./imgs/flee_fsm.jpg"/>
@@ -517,3 +553,12 @@ The next step is to design your own `agent` behaviors! Try to create an `agent` 
 Think about how you could do this with a `PsyanimFSM` that executes an `arrive behavior` on the `player-controlled entity` in a certain `state` and what the `transition conditions` to return to patrolling might look like.
 
 Remember, you can always return to the resources listed in the `references` section above as needed for more advanced study, too.
+
+
+
+
+// TODO: show how to turn on debug info at the end:
+
+Open your `browser console` to see that the state machine is displaying all the states and transitions automagically for you - this debug information didn't require any extra code or boilerplate as it's all part of the `PsyanimFSM` class out-of-the-box.
+
+As you interact with the `AI agent` using your `player-controlled agent`, check to see that these `transitions` logged in the `browser console` make sense to you.
