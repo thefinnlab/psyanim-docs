@@ -241,15 +241,6 @@ One big advantage of a state machine is that it can be easily visualized and rea
 
 The fact that state machines lend themselves so easily to clear visual representations means that subject-matter experts can participate in AI design, regardless of their level of comfort with programming.
 
-While `psyanim2` does not have full support for `hierarchical FSMs` at the moment, it does support a simpler version as described by Ian Millington in his book `Artificial Intelligence for Games`:
-
-> An implementation of hierarchical state machines could be made significantly simpler than this by requiring that transitions can only occur between states at the same level. With this limitation in force, all the recursion code can be eliminated.
-> If you don’t need crosshierarchy transitions, then the simpler version will be easier to implement. 
-
-This simpler hierarchical FSM, called `PsyanimBasicHFSM`, is implemented similar to [pushdown automata](https://en.wikipedia.org/wiki/Pushdown_automaton), but with entire sub-state machines rather than just states, so a 'history' of states is automatically kept internally in the underlying stack data structure and the hierarchy is enforced by position within the stack.
-
-That said, `psyanim2` can always be extended with full-featured `heirarchical FSMs` or `behavior trees` (or a hybrid of the two) at a later time should the need arise.
-
 ---
 
 When designing a state machine for any purpose, I always start with a pencil and a piece of paper, sketching out the `states` represented by `boxes` and `allowed transitions` represented by `arrows`.
@@ -296,7 +287,7 @@ Luckily, `psyanim-cli` can be used to setup all the boiler plate we need to buil
 
 ---
 
-Run the following command in terminal to create the 3 `states` of our `state machine`:
+Run the following command in terminal to create the 2 `states` of our `state machine`:
 
 ```bash
 psyanim asset:fsmstate MyPatrolState MyMoveToItemState -o ./src/basic_hfsm/item_patrol_fsm
@@ -304,9 +295,9 @@ psyanim asset:fsmstate MyPatrolState MyMoveToItemState -o ./src/basic_hfsm/item_
 
 You should see 2 source files show up under the `/src/basic_hfsm/item_patrol_fsm` directory - one for each state.
 
-If you open up `MyPatrolState.js`, you'll see that the state is a `javascript class` with a `contructor` and `5 methods`: `afterCreate`, `enter`, `exit`, `run`, `onResume`, and `onPause`.
+If you open up `MyPatrolState.js`, you'll see that the state is a `javascript class` with a `contructor` and `6 methods`: `afterCreate`, `enter`, `exit`, `run`, `onPause`, `onStop`, and `onResume`.
 
-We can ignore the `onResume` and `onPause` methods for now, as they will be discussed in the next section.
+We can ignore the `onPause`, `onStop`, and `onResume` methods for now, as they will be discussed in the next section.
 
 The `constructor` is only executed once when the state is first created to be added to the state machine.
 
@@ -318,7 +309,7 @@ The `run(t, dt)` method is executed once every simulation frame, so long as the 
 
 All `state transitions` should be added in the `constructor` of the state class, since we only want to add these transitions *once* for each state machine.
 
-Every state machine maintains `state variables` that can be read / written via a set of APIs in the `PsyanimFSMState`.  These `state variables` can be used to trigger transitions.
+Every state machine maintains `state variables` that can be read / written to from any `state` via a set of APIs in the `PsyanimFSMState`.  These `state variables` can be used to trigger transitions.
 
 The general workflow for implementing a `PsyanimFSMState` is as follows:
 
@@ -369,9 +360,9 @@ All `PsyanimFSM` classes inherit a set of methods which can be overriden for dif
 
 The `afterCreate` and `update` methods are just overrides for the base `PsyanimComponent` methods.
 
-We will discuss `onPause`, `onStop` and `onResume` in the next section.  In fact, we can go ahead and remove them from this FSM since they won't be needed here.
+We will discuss `onPause`, `onStop` and `onResume` in the next section.  We can actually remove them from this FSM since they won't be needed here.
 
-Go ahead and copy the finished source file into `MyPatrolFSM.js`:
+Go ahead and copy the finished source file into your `MyItemPatrolFSM.js`:
 
 - [MyItemPatrolFSM.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/item_patrol_fsm/MyItemPatrolFSM.js)
 
@@ -446,11 +437,43 @@ Reload your `experiment` in the `browser` and you should see the `agent` entity 
 
 Great work - you've created your first `finite-state machine` in `psyanim-2`!
 
-## 5. Hierarchical FSM Example
+## 5. Interactive FSM Agent
 
-First, however, let's add a `player-controlled entity` to our `scene definition`, and add a few extra components to our `agent` entity to allow it to execute a `flee behavior` too.
+While `psyanim2` does not have full support for `hierarchical FSMs` at the moment, it does support a simpler version as described by Ian Millington in his book `Artificial Intelligence for Games`:
 
-Adding the `player-controlled entity` to our `entities` array in the `scene definition` is as simple as:
+> An implementation of hierarchical state machines could be made significantly simpler than this by requiring that transitions can only occur between states at the same level. With this limitation in force, all the recursion code can be eliminated.
+> If you don’t need crosshierarchy transitions, then the simpler version will be easier to implement. 
+
+This simpler hierarchical FSM, called `PsyanimBasicHFSM`, is implemented similar to [pushdown automata](https://en.wikipedia.org/wiki/Pushdown_automaton), but with entire sub-state machines rather than just states, so a 'history' of states is automatically kept internally in the underlying stack data structure and the hierarchy is enforced by position within the stack.
+
+That said, `psyanim2` can always be extended with full-featured `heirarchical FSMs` or `behavior trees` (or a hybrid of the two) at a later time should the need arise.
+
+---
+
+In the previous section, we created an `AI-controlled agent` using a `finite-state machine`, but it was just performing it's own tasks without interacting with other `agents` or `humans`.
+
+In this section, we'll learn about `hierarchical FSMs (HFSMs)` by building one that combines the two `finite state machines` we created in the previous two sections.
+
+---
+
+Let's start by creating a `finite-state machine` for an `agent` that responds to a `player-controlled entity`, according to the following state diagram:
+
+<p align="center" style="font-size: 12px;">
+    <img src="./imgs/flee_fsm.jpg"/>
+    <!-- <br>Your caption goes here -->
+</p>
+
+In the `MyFleeState`, the agent will `flee` from a `target`.  In this case, the target will be a `player-controlled entity`.
+
+In the `MyIdleState`, the agent will not execute any `steering behaviors`, but may slowly glide to a stop and wait there for as long as the state is active.
+
+---
+
+First, let's add a `player-controlled entity` to our `scene definition`, and add a few extra components to our `agent` entity to allow it to execute a `flee behavior` too.
+
+Update your `psyanim2` imports at the top of `HelloAIScene.js` to include `PsyanimPlayerController`.  While you're at it, go ahead and add `PsyanimFleeBehavior` and `PsyanimFleeAgent` to your `psyanim2` imports too.
+
+Then, adding the `player-controlled entity` to our `entities` array in the `scene definition` is as simple as:
 
 ```js
 ...
@@ -471,7 +494,7 @@ Adding the `player-controlled entity` to our `entities` array in the `scene defi
 ...
 ```
 
-Now, we just need to add a `PsyanimFleeBehavior` and `PsyanimFleeAgent` component to our `agent` entity so it is able to execute a `flee behavior` when needed:
+Now, we need to add a `PsyanimFleeBehavior` and `PsyanimFleeAgent` component to our `agent` entity so it is able to execute a `flee behavior` when needed:
 
 ```js
 ...
@@ -485,7 +508,6 @@ Now, we just need to add a `PsyanimFleeBehavior` and `PsyanimFleeAgent` componen
 },
 {
     type: PsyanimFleeAgent,
-    enabled: false,
     params: {
         fleeBehavior: {
             entityName: 'agent',
@@ -503,9 +525,143 @@ Now, we just need to add a `PsyanimFleeBehavior` and `PsyanimFleeAgent` componen
 ...
 ```
 
-Notice that, in the above snippet, the `PsyanimFleeAgent` component has it's `enabled` property set to `false`.  This is because it would conflict with the `PsyanimPathFollowingAgent` if we had them both enabled simultaneously.
+Next, let's setup our `finite-state machine` to actually have the agent move between `fleeing` and `idling`.
 
-So, we disable the `PsyanimFleeAgent` to start out, and our `PsyanimFSM`, will be responsible for switching between the `PsyanimFleeAgent` and the `PsyanimPathfollowingAgent` behaviors as appropriate later at runtime.
+Back in a terminal, from the project root directory, run the following command to create our 2 state classes:
+
+```bash
+psyanim asset:fsmstate MyFleeState MyIdleState -o ./src/basic_hfsm/flee_fsm
+```
+
+You should see `MyFleeState.js` and `MyIdleState.js` created under `./src/basic_hfsm/flee_fsm`.
+
+Replace the contents of these new files with the finished source code here:
+
+- [MyFleeState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/flee_fsm/MyFleeState.js)
+- [MyIdleState.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/flee_fsm/MyIdleState.js)
+
+Now, let's create the actual FSM class, `MyFleeFSM`, which will control how the agent transitions in and out of these states:
+
+```bash
+psyanim asset:fsm MyFleeFSM -o ./src/basic_hfsm/flee_fsm
+```
+
+Replace the contents of the `MyFleeFSM.js` file with the completed source code:
+
+- [MyFleeFSM.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/flee_fsm/MyFleeFSM.js)
+
+There really aren't any fundamentally new concepts in these 3 files here, with only 2 files for state definitions and 1 for the FSM definition which ties together the states.
+
+If you're interested in exploring the internal workings of these FSMs, it's left here as an exercise to use the concepts we've learned to study the code and see what it's doing.
+
+At a high-level, the `MyFleeFSM` class just adds the `MyIdleState` and `MyFleeState` to a state machine, with the `MyFleeState` as the initial state and a tad bit of configuration.
+
+In `MyIdleState`, the `agent` has no steering forces applied to it at all.
+
+In `MyFleeState`, the `agent` flees until it is outside of the (`paniceDistance` + `safteyDistance`).
+
+To wrap up the `MyFleeFSM`, let's update our imports to include `MyFleeFSM` and add it to our `agent` entity's `components array` as follows:
+
+```js
+{
+    type: MyFleeFSM
+},
+```
+
+Great work - you've just finished creating your `MyFleeFSM`!  
+
+However, this isn't quite ready to work since we can't simply have 2 `PsyamimFSMs` on the same `agent` without a `PsyanimBasicHFSM` to tie them together.
+
+## 6. Hierarchical FSMs in Psyanim-2
+
+Now, we have two state machines, `MyItemPatrolFSM` and `MyFleeFSM`, attached to our `agent` entity as `components`.
+
+To do this, we will create a `basic hierarchical state machine` which will run both our our `PsyanimFSMs` as `sub-state machines`.
+
+A `PsyanimBasicHFSM` is capable of running any one of multiple configured `PsyanimFSMs` at a given time, and switching between each one at appropriate times.
+
+An `agent` with a `PsyanimBasicHFSM` component attached is required to always be running exactly 1 `PsyanimFSM` at any given time as a `sub-state machine`.
+
+Every `PsyanimBasicHFSM` has an `initialSubStateMachine` property which defines the `sub-state machine` it will initially execute.
+
+An `interrupt` is a mechanism for switching between `sub-state machines` in a `PsyanimBasicHFSM`, and it is `triggered` by a user-defined condition.
+
+A `PsyanimBasicHFSM` can have many `interrupt conditions` defined which trigger a switch from one `sub-state machine` to another.
+
+The `PsyanimBasicHFSM` maintains a stack data structure internally, indicating the priority of `sub-state machines` to execute.
+
+When an `interrupt` is `triggered`, the currently executing `sub-state machine` is either `stopped` or `paused` and the target `sub-state machine` is pushed onto the stack and `resumed`.
+
+Any time a `sub-state machine` is `stopped`, it is removed from the stack.
+
+Any time a `sub-state machine` is `paused`, it remains on the stack.
+
+Any time an `interrupt` is triggered, the `target sub-state machine` is `resumed` and pushed onto the stack.
+
+A `sub-state machine` that is `resumed` from a `paused` state will continue from where it previously left off, with all of it's `state variables` in tact.
+
+A `sub-state machine` that is `resumed` from a `stopped` state will restart it's execution from it's `initial state`, with all `state variables` reset also.
+
+---
+
+As with any `finite state machine`, we'll begin the design of our `hierarchical state machine`, `MyBasicHFSM`, with a `state diagram` sketch:
+
+<p align="center" style="font-size: 12px;">
+    <img src="./imgs/basic_hfsm.jpg"/>
+    <!-- <br>Your caption goes here -->
+</p>
+
+**NOTE: this diagram does not denote when a sub-state machine should be `paused` vs. `stopped`. A visual convention for this is in the works - stay tuned!**
+
+Here, we can see the two `sub-state machines` of `MyBasicHFSM` are: `MyItemPatrolFSM` and `MyFleeFSM`.
+
+Each of these `sub-state machines` behave just the same as they would have independently.
+
+The purpose of `MyBasicHFSM` is to tie these two `sub-state machines` into a larger `state machine` with rules for switching between them, defined as `interrupts` or `interrupt conditions`.
+
+Similar to how `arrows` were used on our previous `state machine diagrams` to denote allowed `transitions` between states, `arrows` are also used to denote `interrupts` which cause a `hierarchical state machine` to switch from one `sub-state machine` to another.
+
+In our `MyBasicHFSM` machine, we can see there are two `interrupts`, labeled `I1`, and `I2`, with their `interrupt conditions` defined at the bottom of the diagram.
+
+The `initialSubStateMachine` of this `MyBasicHFSM` is the `MyItemPatrolFSM`.
+
+In accordance with the `interrupt conditions` for `MyBasicHFSM`, if an attacker is within `panicDistance` of this agent, `I1` is triggered and `MyBasicHFSM` will `pause` the `MyItemPatrolFSM` and `resume` the `MyFleeFSM`, pushing it onto the top of the internal sub-state machine `stack`.
+
+When the `MyFleeFSM` is running, if the `agent` has been in it's `idle state` for a duration of `returnToPatrolTime`, `I2` is triggered and `MyBasicHFSM` will `stop` the `MyFleeFSM`, popping it off the stack, and then `resume` the `MyItemPatrolFSM`.
+
+It is up to the `AI designers / developers` to ensure that the `interrupt conditions` are setup in such a way that the `hierarchical state machine` will only switch between states as intended.
+
+---
+
+// TODO: everything from here on is a major WIP...
+
+---
+
+```bash
+psyanim asset:component MyBasicHFSM -o ./src/basic_hfsm
+```
+
+- [MyBasicHFSM.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/MyBasicHFSM.js)
+
+```js
+{
+    type: MyBasicHFSM,
+    params: {
+        target: {
+            entityName: 'player',
+        },
+        
+        fleePanicDistance: 150,
+        fleeSafetyDistance: 50,
+
+        returnToPatrolTime: 1500
+    }
+}
+```
+
+---
+---
+---
 
 By this point, if you reload the experiment in your browser, you should see two agents: a `red` player-controlled agent and `blue` AI-controlled agent.
 
@@ -516,14 +672,10 @@ However, if you move the `player-controlled agent` into the `AI-controlled agent
 This is not what we want.  So, let's build out our `finite state machine` to give the `AI-controlled agent` the `decision-making` logic necessary to switch between behaviors as desired.
 
 
-<p align="center" style="font-size: 12px;">
-    <img src="./imgs/flee_fsm.jpg"/>
-    <!-- <br>Your caption goes here -->
-</p>
 
-In the `MyFleeState`, the agent will `flee` from a `target`.  In this case, the target will be a `player-controlled entity`.
 
-In the `MyIdleState`, the agent will not execute any `steering behaviors`, but may slowly glide to a stop and wait there for as long as the state is active.
+
+
 
 ...
 
@@ -537,10 +689,11 @@ In the `MyIdleState`, the agent will not execute any `steering behaviors`, but m
 
 - In the `MyIdleState`, the `agent` waits a period of time before attempting to transition back to the `MyPatrolState`.  If, while waiting, the `player-controlled entity` gets too close to the `agent` entity, the `agent` will transition back to the `MyFleeState`.
 
-<p align="center" style="font-size: 12px;">
-    <img src="./imgs/basic_hfsm.jpg"/>
-    <!-- <br>Your caption goes here -->
-</p>
+
+---
+---
+---
+
 
 ---
 
@@ -555,7 +708,7 @@ Think about how you could do this with a `PsyanimFSM` that executes an `arrive b
 Remember, you can always return to the resources listed in the `references` section above as needed for more advanced study, too.
 
 
-
+## 7. Debugging FSMs
 
 // TODO: show how to turn on debug info at the end:
 
