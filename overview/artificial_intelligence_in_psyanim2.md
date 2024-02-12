@@ -443,24 +443,7 @@ Great work - you've created your first `finite-state machine` in `psyanim-2`!
 
 ## 5. Interactive FSM Agent
 
-While `psyanim2` does not have full support for `hierarchical FSMs` at the moment, it does support a simpler version as described by Ian Millington in his book `Artificial Intelligence for Games`:
-
-> An implementation of hierarchical state machines could be made significantly simpler than this by requiring that transitions can only occur between states at the same level. With this limitation in force, all the recursion code can be eliminated.
-> If you don’t need crosshierarchy transitions, then the simpler version will be easier to implement. 
-
-This simpler hierarchical FSM, called `PsyanimBasicHFSM`, is implemented similar to [pushdown automata](https://en.wikipedia.org/wiki/Pushdown_automaton), but with entire sub-state machines rather than just states, so a 'history' of states is automatically kept internally in the underlying stack data structure and the hierarchy is enforced by position within the stack.
-
-That said, `psyanim2` can always be extended with full-featured `heirarchical FSMs` or `behavior trees` (or a hybrid of the two) at a later time should the need arise.
-
----
-
-In the previous section, we created an `AI-controlled agent` using a `finite-state machine`, but it was just performing it's own tasks without interacting with other `agents` or `humans`.
-
-In this section, we'll learn about `hierarchical FSMs (HFSMs)` by building one that combines the two `finite state machines` we created in the previous two sections.
-
----
-
-Let's start by creating a `finite-state machine` for an `agent` that responds to a `player-controlled entity`, according to the following `state diagram`:
+Now let's create a `finite-state machine` for an `agent` that responds to a `player-controlled entity`, according to the following `state diagram`:
 
 <p align="center" style="font-size: 12px;">
     <img src="./imgs/flee_fsm.jpg"/>
@@ -577,6 +560,19 @@ Great work - you've just finished creating your `MyFleeFSM`!
 However, this isn't quite ready to work since we can't simply have 2 `PsyamimFSMs` on the same `agent` without a `PsyanimBasicHFSM` to tie them together.
 
 ## 6. Hierarchical FSMs in Psyanim-2
+
+In this section, we'll learn about `hierarchical FSMs (HFSMs)` by building one that combines the two `finite state machines` we created in the previous two sections.
+
+While `psyanim2` does not have full support for `hierarchical FSMs` at the moment, it does support a simpler version as described by Ian Millington in his book `Artificial Intelligence for Games`:
+
+> An implementation of hierarchical state machines could be made significantly simpler than this by requiring that transitions can only occur between states at the same level. With this limitation in force, all the recursion code can be eliminated.
+> If you don’t need crosshierarchy transitions, then the simpler version will be easier to implement. 
+
+This simpler hierarchical FSM, called `PsyanimBasicHFSM`, is implemented similar to [pushdown automata](https://en.wikipedia.org/wiki/Pushdown_automaton), but with entire sub-state machines rather than just states, so a 'history' of states is automatically kept internally in the underlying stack data structure and the hierarchy is enforced by position within the stack.
+
+That said, `psyanim2` can always be extended with full-featured `heirarchical FSMs` or `behavior trees` (or a hybrid of the two) at a later time should the need arise.
+
+---
 
 Now, we have two state machines, `MyItemPatrolFSM` and `MyFleeFSM`, attached to our `agent` entity as `components`.
 
