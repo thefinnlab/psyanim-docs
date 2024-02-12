@@ -64,7 +64,11 @@ The `AI agent` we'll create will `patrol` back and forth between a few points in
 
 We will give the AI agent a 'brain' later to decide how to switch between different behaviors (known as `decision-making` in game AI) depending on what's happening in the environment, but for this section, let's just get the AI agent patrolling between a few points using a `pathfollowing` steering behavior, so we can learn a bit about the `steering architecture` in general.
 
-Let's get started by creating a new, empty `psyanim2` project using `psyanim-cli` as we did in the [Hello Psyanim 2.0 tutorial](/overview/hello_psyanim_2.md#2-creating-a-new-psyanim-2-project).
+Let's get started by creating a new, empty `psyanim2` project using `psyanim-cli` (make sure `NodeJS v18+`, `Git`, and `psyanim-cli` are installed first):
+
+```bash
+psyanim init
+```
 
 Let's create an new scene with `psyanim-cli`:
 
@@ -252,7 +256,7 @@ I highly recommend that, before trying to code up any state machine, you start b
     <!-- <br>Your caption goes here -->
 </p>
 
-Looking at the state machine diagram above, you can see that this `finite state machine`, named `MyItemPatrolFSM`, consists of `2 states`: 
+Looking at the `state diagram` above, you can see that this `finite state machine`, named `MyItemPatrolFSM`, consists of `2 states`: 
 
 - MyPatrolState
 - MyMoveToItemState
@@ -340,7 +344,7 @@ In the `run()` method, we query the current `PsyanimScene` object to see if ther
 
 The `enter()` and `run()` methods of any state do not need to explicitly check `state variables` to `trigger` state transitions.  This happens automatically in the `PsyanimFSM` state machine.
 
-If you have time, as an exercise, check out both states' source code and try to understand how the code there relates to what we see in our state machine diagram sketch from earlier.
+If you have time, as an exercise, check out both states' source code and try to understand how the code there relates to what we see in our state diagram sketch from earlier.
 
 ---
 
@@ -380,7 +384,7 @@ Let's add this `MyItemPatrolFSM` component to our `HelloAIScene` definition by f
 
 ```js
 {
-    type: MyPatrolFleeAgentFSM,
+    type: MyItemPatrolFSM,
 }
 ```
 
@@ -456,7 +460,7 @@ In this section, we'll learn about `hierarchical FSMs (HFSMs)` by building one t
 
 ---
 
-Let's start by creating a `finite-state machine` for an `agent` that responds to a `player-controlled entity`, according to the following state diagram:
+Let's start by creating a `finite-state machine` for an `agent` that responds to a `player-controlled entity`, according to the following `state diagram`:
 
 <p align="center" style="font-size: 12px;">
     <img src="./imgs/flee_fsm.jpg"/>
@@ -576,7 +580,7 @@ However, this isn't quite ready to work since we can't simply have 2 `PsyamimFSM
 
 Now, we have two state machines, `MyItemPatrolFSM` and `MyFleeFSM`, attached to our `agent` entity as `components`.
 
-To do this, we will create a `basic hierarchical state machine` which will run both our our `PsyanimFSMs` as `sub-state machines`.
+Next, we will create a `basic hierarchical state machine` which will run both our our `PsyanimFSMs` as `sub-state machines`.
 
 A `PsyanimBasicHFSM` is capable of running any one of multiple configured `PsyanimFSMs` at a given time, and switching between each one at appropriate times.
 
@@ -619,29 +623,53 @@ Each of these `sub-state machines` behave just the same as they would have indep
 
 The purpose of `MyBasicHFSM` is to tie these two `sub-state machines` into a larger `state machine` with rules for switching between them, defined as `interrupts` or `interrupt conditions`.
 
-Similar to how `arrows` were used on our previous `state machine diagrams` to denote allowed `transitions` between states, `arrows` are also used to denote `interrupts` which cause a `hierarchical state machine` to switch from one `sub-state machine` to another.
+Similar to how `arrows` were used on our previous `state diagrams` to denote allowed `transitions` between states, `arrows` are also used to denote `interrupts` which cause a `hierarchical state machine` to switch from one `sub-state machine` to another.
 
-In our `MyBasicHFSM` machine, we can see there are two `interrupts`, labeled `I1`, and `I2`, with their `interrupt conditions` defined at the bottom of the diagram.
+The `interrupts`, however, are identified *by convention* in `psyanim-2 state diagrams` by a prefix of capital `I`.
 
-The `initialSubStateMachine` of this `MyBasicHFSM` is the `MyItemPatrolFSM`.
+In our `MyBasicHFSM` machine, we can see there are two `interrupts`, labeled `I1` and `I2`, with their `interrupt conditions` defined at the bottom of the diagram.
+
+The `initialSubStateMachine` of this `MyBasicHFSM` is the `MyItemPatrolFSM`.  This is the sub-state machine that will be active initially, and the first state-machine on the HFSM's internal stack.
 
 In accordance with the `interrupt conditions` for `MyBasicHFSM`, if an attacker is within `panicDistance` of this agent, `I1` is triggered and `MyBasicHFSM` will `pause` the `MyItemPatrolFSM` and `resume` the `MyFleeFSM`, pushing it onto the top of the internal sub-state machine `stack`.
 
 When the `MyFleeFSM` is running, if the `agent` has been in it's `idle state` for a duration of `returnToPatrolTime`, `I2` is triggered and `MyBasicHFSM` will `stop` the `MyFleeFSM`, popping it off the stack, and then `resume` the `MyItemPatrolFSM`.
 
-It is up to the `AI designers / developers` to ensure that the `interrupt conditions` are setup in such a way that the `hierarchical state machine` will only switch between states as intended.
+It is up to the `AI designers / developers` to design the `interrupt conditions` in such a way that the `hierarchical state machine` will only switch between states as desired.
 
 ---
 
-// TODO: everything from here on is a major WIP...
-
----
+Now that we've got a better understanding of the high-level operation of the `hierarchical FSM`, let's go ahead and implement it in our project.  Run the following command from the project root dir:
 
 ```bash
 psyanim asset:component MyBasicHFSM -o ./src/basic_hfsm
 ```
 
+Open up `MyBasicHFSM.js` and replace it's contents with the following finished source code:
+
 - [MyBasicHFSM.js](https://github.com/thefinnlab/hello-psyanim2/blob/artificial_intelligence/src/basic_hfsm/MyBasicHFSM.js)
+
+We updated the code so that `MyBasicHFSM` inherits from `PsyanimBasicHFSM`, which is also a `PsyanimComponent`.
+
+In the `afterCreate()` method, we add and configure the `sub-state machines` of this `PsyanimBasicHFSM`, which are `MyItemPatrolFSM` and `MyFleeFSM`.
+
+We then define our two interrupts using the `this.addInterrupt(...)` method of `PsyanimBasicHFSM`.
+
+Each `addInterrupt` call takes a minimum of 3 parameters, with an optional fourth:
+
+- `sourceFSMType`: the type of the FSM from which the interrupt can be triggered
+
+- `variableKey`: the key of the state variable against which the `interrupt condition` will be checked
+
+- `interruptCondition`: the condition on which the interrupt will occur. A function with 1 arg - the `state variable value`
+
+- `destinationFSMType`: the sub-state machine type that this HFSM will push onto the stack if interrupt is triggered.  If not provided, this interrupt will remove the current FSM from the stack and run the one below it.
+
+Finally, the `MyBasicHFSM` component must define the `initialSubStateMachine` which will be the first sub-state machine pushed onto the stack and the initial sub-state machine that executes on scene start.
+
+---
+
+Back in our `HelloAIScene` scene definition, let's add the following `component definition` to our `agent` entity's components array:
 
 ```js
 {
@@ -659,59 +687,100 @@ psyanim asset:component MyBasicHFSM -o ./src/basic_hfsm
 }
 ```
 
----
----
----
+The `fleePanicDistance` and `fleeSafetyDistance` are used to determine at what distance the `agent` should start/stop fleeing from the `player`.
 
-By this point, if you reload the experiment in your browser, you should see two agents: a `red` player-controlled agent and `blue` AI-controlled agent.
+The `returnToPatrolTime` is the amount of time the `agent` needs to remain in it's `idle` state without fleeing before it can return to it's `MyItemPatrolFSM` task of patrolling & collecting items.
 
-You should be able to move the `red` player-controlled agent around in the scene using the `W`, `S`, `A`, and `D` keys.
+Great work! If you reload the experiment in your browser, you should see two entities.
 
-However, if you move the `player-controlled agent` into the `AI-controlled agent`, the AI controlled agent doesn't flee and the two entities just collide.
+One is the `player` entity and can be moved around with the `W`, `A`, `S`, and `D` keys on your keyboard.  The `player` entity is *always* a red and never changes color.
 
-This is not what we want.  So, let's build out our `finite state machine` to give the `AI-controlled agent` the `decision-making` logic necessary to switch between behaviors as desired.
+The other entity is our `agent` and should be patrolling back and forth unless the player moves close to it.  It will change colors depending on it's state, as we've seen previously in our code.
 
+When the `player` approaches the `agent`, it's `MyItemPatrolFSM` will be interrupted and it's `MyFleeFSM` will be pushed onto the HFSM stack to be executed.
 
-
-
-
-
-
-...
-
-...general flow of this state machine:
-
-...
-
-- When the `player-controlled entity` gets within a certain distance of the agent, it will transition to the `MyFleeState` where it will quickly accelerate away from the `player-controlled entity`.
-
-- When the `player-controlled-entity` is far enough away from the `agent` entity, the `agent` will transition to the `MyIdleState`.
-
-- In the `MyIdleState`, the `agent` waits a period of time before attempting to transition back to the `MyPatrolState`.  If, while waiting, the `player-controlled entity` gets too close to the `agent` entity, the `agent` will transition back to the `MyFleeState`.
-
-
----
----
----
-
+When an `item` appears in the scene (as a green circle near the center of the canvas), as long as the `agent` is in the `MyItemPatrolFSM` sub-state machine, it will switch to the `MyMoveToItemState` and collect the item before returning to a `patrol`.
 
 ---
 
-In this tutorial, we've created an `AI agent` for an `interactive experiment` that uses a `finite state machine` to decide which steering behaviors to execute at any given moment.
+As an exercise, to test our intuition against what we observe in practice, let's remove the interrupt that takes the `MyBasicHFSM` from the `MyItemPatrolFSM` sub-state machine to the `MyFleeFSM` sub-state machine and observe the resulting behavior.
 
-This is only a simple example of what's possible with the `Psyanim Decision-Making Framework` and `steering behavior` library.
+We should expect to see the `agent` never switching to the `MyFleeFSM`, regardless of how close the `player` entity gets to it.
 
-The next step is to design your own `agent` behaviors! Try to create an `agent` that aggressively seeks the `player-controlled entity` when it gets too close, and then gives up after a certain distance from it's patrol path.
+Let's update our `MyBasicHFSM::afterCreate()` method to test this case:
 
-Think about how you could do this with a `PsyanimFSM` that executes an `arrive behavior` on the `player-controlled entity` in a certain `state` and what the `transition conditions` to return to patrolling might look like.
+```js
+    afterCreate() {
 
-Remember, you can always return to the resources listed in the `references` section above as needed for more advanced study, too.
+        super.afterCreate();
 
+        // configure and add sub-state machines
+        this._itemPatrolFSM = this.entity.getComponent(MyItemPatrolFSM);
+        this._itemPatrolFSM.target = this.target;
 
-## 7. Debugging FSMs
+        this._fleeFSM = this.entity.getComponent(MyFleeFSM);
+        this._fleeFSM.target = this.target;
+        this._fleeFSM.fleePanicDistance = this.fleePanicDistance;
+        this._fleeFSM.fleeSafetyDistance = this.fleeSafetyDistance;
 
-// TODO: show how to turn on debug info at the end:
+        this.addSubStateMachine(this._itemPatrolFSM);
+        this.addSubStateMachine(this._fleeFSM);
 
-Open your `browser console` to see that the state machine is displaying all the states and transitions automagically for you - this debug information didn't require any extra code or boilerplate as it's all part of the `PsyanimFSM` class out-of-the-box.
+        // add interrupts
+        // this.addInterrupt(MyItemPatrolFSM, 'distanceToTarget', (value) => value < this.fleePanicDistance, MyFleeFSM);
+        // this.addInterrupt(MyFleeFSM, 'idleTime', (value) => value > this.returnToPatrolTime);
 
-As you interact with the `AI agent` using your `player-controlled agent`, check to see that these `transitions` logged in the `browser console` make sense to you.
+        // setup initial substate machine to run
+        this.initialSubStateMachine = this._itemPatrolFSM;
+    }
+```
+
+If you reload the experiment in your browser, you should see that the `agent` does indeed remain in the `MyPatrolFSM` at all times, irrespective of it's proximity to the `player`.
+
+---
+
+As a final exercise, to test our intuitions even further, let's keep the `interrupts` commented out in the `MyBasicHFSM::afterCreate()` method and set the `initialSubStateMachine` to the `MyFleeFSM` component, as follows:
+
+```js
+    afterCreate() {
+
+        super.afterCreate();
+
+        // configure and add sub-state machines
+        this._itemPatrolFSM = this.entity.getComponent(MyItemPatrolFSM);
+        this._itemPatrolFSM.target = this.target;
+
+        this._fleeFSM = this.entity.getComponent(MyFleeFSM);
+        this._fleeFSM.target = this.target;
+        this._fleeFSM.fleePanicDistance = this.fleePanicDistance;
+        this._fleeFSM.fleeSafetyDistance = this.fleeSafetyDistance;
+
+        this.addSubStateMachine(this._itemPatrolFSM);
+        this.addSubStateMachine(this._fleeFSM);
+
+        // add interrupts
+        // this.addInterrupt(MyItemPatrolFSM, 'distanceToTarget', (value) => value < this.fleePanicDistance, MyFleeFSM);
+        // this.addInterrupt(MyFleeFSM, 'idleTime', (value) => value > this.returnToPatrolTime);
+
+        // setup initial substate machine to run
+        this.initialSubStateMachine = this._fleeFSM;
+    }
+```
+
+If you now reload the experiment in your browser again, you'll see that the agent starts out in the `MyFleeFSM` and never gets interrupted to return to the `MyItemPatrolFSM`.
+
+Furthermore, the agent starts out in the `MyIdleState` of the `MyFleeFSM`, and does transition to `MyFleeState` when the `player` is close enough nearby.
+
+---
+
+In the previous two exercises involving `MyBasicHFSM`, where we removed `interrupts` and changed the `initialSubStateMachine`, we observed an important property of the `PsyanimBasicHFSM`, which is it's modularity.
+
+Not only is this easier to understand, but we are able to add/remove interrupts and sub-state machines with relative ease, once they are designed and implemented.
+
+This modularity makes for a more flexible workflow that enables rapid prototyping and building highly configurable, complex agent behaviors.
+
+---
+
+In this tutorial, we've learned about the `AI Steering Architecture` and `Decision-Making Framework` in `psyanim-2` by creating an interactive experiment that uses `steering behaviors` and `finite-state machines` to control an `AI Agent`.
+
+To continue this journey into the world of `game AI`, check out the resources in [section 2](/overview/artificial_intelligence_in_psyanim2.md#_2-best-references-for-ai-techniques-used-in-psyanim-2) of this tutorial!
