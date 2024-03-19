@@ -4,34 +4,6 @@
 
 ## 1. Core concepts
 
-`Psyanim 2.0` is built on top of [Phaser 3](https://phaser.io/) and has a flexible [component architecture](https://gameprogrammingpatterns.com/component.html).
-
-In `Psyanim 2.0`, everything that is seen in the world lives in a `PsyanimScene`, which is an abstraction for the 2D world we are simulating.
-
-The `PsyanimScene` acts as a container for `PsyanimEntity` objects.
-
----
-
-Any object that exists in a scene, regardless of its visual representation, is called a `PsyanimEntity`.
-
-A `PsyanimEntity` acts a container for `PsyanimComponents`.  
-
-More technically, it's an abstraction for anything that exists in a Psyanim Scene with a particular location, rotation, and (optionally) a visual representation which can have physics applied to it.
-
-Entities may or may not have a visual representation in the scene.
-
-Moreover, entities alone do not have any logic or behaviors.  While entities have no user-defined state, they do have a position, orientation and velocity in the world, and can have forces / accelerations applied to them.
-
-Any object in your simulation that needs a position or orientation, a visual representation in the scene, or needs to have physics applied to it, should be added to the scene as an entity.
-
----
-
-All user-defined state and behaviors are encapsulated in `PsyanimComponents`, which are reusable scripts that can be attached to a `PsyanimEntity` and offer hooks into the real-time update loop of each scene.
-
----
-
-When building experiments using [jsPsych](https://www.jspsych.org/), we can run `trials` using the `PsyanimJsPsychPlugin` where each trial runs an instance of a `PsyanimScene`.
-
 ## 2. Creating a new Psyanim 2 Project
 
 ***Pre-requisites: Requires [NodeJS](https://nodejs.org/en) v18.16.0+, an up-to-date installation of [Git](https://git-scm.com/), and [Psyanim-CLI](https://github.com/thefinnlab/psyanim-cli.git) installed globally.***
