@@ -95,7 +95,7 @@ Great work - you've successfully setup a `Psyanim-2` experiment with a `predator
 
 An `Psyanim-2` experiment project is composed of of many files.
 
-However, except in advanced usage, there are only a few key files a researcher will be concerned with:
+However, there are only a few key files a researcher will be concerned with:
 
 - <ins>*index.js*</ins>: The main entry point for the `psyanim-2` experiment project. Most configuration happens here.
 - <ins>*scene definitions*</ins>: These scene definitions define the `psyanim-2 scenes` that are used in trials.
@@ -190,4 +190,62 @@ We will discuss these in greater detail in later sections, but for now, it's eno
 
 ## 5. Adding Template Scenes
 
-TODO: in this section, let's add some extra template scenes to our project and test with them
+While `psyanim-2` was designed to be extremely flexible and extensible with its [component architecture](https://gameprogrammingpatterns.com/component.html), you don't need to start from empty scenes.
+
+`Scene definitions` can be generated for your experiment from `scene templates` using `Psyanim-CLI`.  This can serve as a quicker starting point for building new scenes based on existing ones.
+
+Scene templates serve as starting points for building experiments on top of existing scenes that have agents performing certain behaviors / algorithms.
+
+In the previous sections, we were introduced to `Psyanim Scenes` by starting from a `template scene`, `PredatorPreyV2`, as opposed to building a scene from scratch with `entities` and `components`.
+
+In this section, we'll get more familiar with some of the existing template scenes available out-of-the-box in `Psyanim 2`, which should help reinforce the process of creating trials from scene definitions.
+
+To view a list of what template scenes are currently available to add to your project, run the following command in terminal using psyanim-cli:
+
+```bash
+psyanim template -h
+```
+
+You should see a list of valid `subcommands` for the `template` command in `Psyanim-CLI`'s output, as well a description associated with each one.
+
+Each of these subcommands can be used to add a `scene definition` to your project based on a template.  
+
+---
+
+Let's add a `playfightv2` scene definition to our project with the following command:
+
+```bash
+psyanim template:playfightv2 -o ./src/scenes
+```
+
+You should see `PlayfightV2.js` show up under the `./src/scenes` directory in your project.
+
+Open up this file so we can inspect its contents as a learning exercise.  This scene definition has two just entities: `agent1` and `agent2`.
+
+Since these two agents share many parameters that we'd like to potentially modify together, there are some constant variables at the top of the scene definition file which are used to modify them in a single place.
+
+Now, let's create a `jsPsych trial` based on this `Psyanim Scene Definition` and add it to the experiment timeline.
+
+Open up `index.js` and add the following import statement after the `PredatorPreyV2` import statement:
+
+```js
+import PlayfightV2 from './scenes/PlayfightV2.js'; 
+```
+
+Next, after the `predatorPreyV2Trial` is added to the timeline, let's add the following code to create a `jsPsych trial` based on our `playfight-v2 scene definition` and add it to the experiment timeline:
+
+```js
+let playfightV2Trial = new PsyanimJsPsychTrial(PlayfightV2, PlayfightV2.key);
+
+timeline.push(playfightV2Trial.jsPsychTrialDefinition);
+```
+
+Note that the `PsyanimJsPsychTrial` has a `jsPsychTrialDefinition` member that we add to the timeline.  It's the responsibility of the `PsyanimJsPsychTrial` class to handle generating a valid jsPsych trial definition for us.
+
+If you reload the experiment in your browser, the 3rd jsPsych trial that plays will be the `Playfight v2` trial.
+
+In this trial, you should see two green circle-shaped agents wandering about, then turning red as they charge at each other and purple as they separate to create distance between each other.
+
+Great work - you've added a template scene definition to your experiment project using psyanim-cli!
+
+Remember, you can always run `psyanim template -h` to see the help menu for template scene generation, including a list of available subcommands for the various templates.
