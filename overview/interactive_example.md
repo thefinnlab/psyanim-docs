@@ -1,5 +1,7 @@
 # <ins>Interactive Predator Chasing</ins>
 
+***Pre-requisites: You'll want to make sure you complete the [Firebase Setup tutorial](/overview/firebase_setup.md) because you'll need it to complete this tutorial!***
+
 ## 1. Overview and Project Setup
 
 In this tutorial, we'll setup a new experiment with multiple interactive trials and see how to record each trial's metadata, as well as agent and player trajectories to `Google Firebase`.
@@ -97,6 +99,23 @@ In this section, we'll create multiple `jsPsych Trials` that are variations of t
 
 This is useful for experiments where we would like to see how a subject's perception of agent interactions changes with respect to a particular variable.
 
+To start, let's update our `psyanim2 import statement` at the top of our `index.js` so it has the following imports:
+
+```js
+import { 
+    PsyanimApp, 
+    PsyanimJsPsychPlugin,
+    PsyanimJsPsychTrial,
+
+    PsyanimFirebaseBrowserClient,
+
+    PsyanimConstants,
+
+    PsyanimPredatorFSM
+
+} from 'psyanim2';
+```
+
 ---
 
 Let's create 2 more `predator-chase` trials where the predator chases the mouse, and we'll do so by creating a new `PsyanimJsPsychTrial` object using the same scene definition as before, but with a different `scene key`.
@@ -138,4 +157,114 @@ interactivePredatorMouseV2Trial3.setComponentParameter('predator', PsyanimPredat
 timeline.push(interactivePredatorMouseV2Trial3.jsPsychTrialDefinition);
 ```
 
-Here, we modify two component parameters on the `predator` entity's `PsyanimPredatorFSM` components: `maxWanderSpeed` and `maxChargeSpeed`.
+Here, we modify two component parameters on the `predator` entity's `PsyanimPredatorFSM` components, `maxWanderSpeed` and `maxChargeSpeed`, increasing them to `5.0`, so we should see the entity traveling faster than the ones in the previous two trials.
+
+---
+
+Reload your experiment in the browser and you should now see two more trials in your jsPsych experiment.
+
+In the first trial and third trials, you should see a triangle-shaped predator agent.
+
+In the second trial, you should see a circle-shaped agent.
+
+The first two trial's parameters are the same, except for the shape of the agent.
+
+The third trial has the same shape as the first, but the agent should be moving significantly faster.
+
+---
+
+Now let's create 3 more trials, varying the `chase subtlety` parameter for the predator agent in each one.
+
+Add the following code right after the line where we pushed the third interactive predator trial into the jsPsych timeline array:
+
+```js
+// chase subtlety trials
+let subtletyValues = [ 5, 75, 180];
+
+for (let i = 0; i < subtletyValues.length; ++i)
+{
+    let predatorChaseSubtletyTrial = new PsyanimJsPsychTrial(
+        InteractivePredatorMouseV2, 'sublety_' + (i + 1));
+
+    predatorChaseSubtletyTrial.setComponentParameter('predator',
+        PsyanimPredatorFSM, 'subtlety', subtletyValues[i]);
+
+    timeline.push(predatorChaseSubtletyTrial.jsPsychTrialDefinition);
+}
+```
+
+In the code above, we declare an array of subtlety values we'd like to create trials with, and then loop over each subtlety value and create a trial in the jsPsych timeline, setting the appropriate `subtlety` value of the `PsyanimPredatorFSM` component for each trial.
+
+These subtlety angles are angles defined with respect to a line from the predator to it's target prey.
+
+The predator will approach the prey during a 'charge' with some degree of subtlety, where the angle of approach is somewhere between 0 degrees (head-on) or some random value no larger than the `subtlety` paramater.
+
+The subtlety values represent a maximum angle between the line of sight from predator-to-prey and the actual direction the predator will move in.
+
+For the subtlety value of 5 degrees, we expect the predator will basically be moving straight toward the prey.
+
+For a subtlety value of 75 degrees, the predator will move towards the prey, but not directly towards it and never in a direction away from it.
+
+And for a subtlety value of 180 degrees, the predator can move towards or away from the prey.
+
+---
+
+Great work! Reload your experiment in the browser and you should see there are now 6 trials.
+
+The first 3 trials share a constant subtlety parameter value.
+
+The last 3 trials are our `chase-subtlety` experiment trials, where the subtlety values are `[5, 75, 180]` in each one, respectively.
+
+## 3. Saving Data To Firestore
+
+To start saving data to a `Google Firebase Firestore` database, there are just a few quick setup steps.
+
+At a high-level, the only thing that needs to be done to enable saving `trial metadata` out to firebase is for the `PsyanimJsPsychPlugin`'s `documentWriter` property to be set to a valid document writer.
+
+For firebase, the document writer we'll want to use is the `PsyanimFirebaseBrowserClient`.
+
+For the `PsyanimFirebaseBrowserClient` to communicate with firebase, you'll need to pass it a valid `firebase config` object.
+
+So, to start, copy the `firebase.config.json` you created in the [Firebase Setup tutorial](/overview/firebase_setup.md) into the root of this project.
+
+Next, let's open our `index.js` and uncomment the following `import` statement near the top of the file:
+
+```js
+import firebaseJsonConfig from '../firebase.config.json';
+```
+
+Next, under the section with the code comment `Setup PsyanimJsPsychPlugin`, uncomment the following two lines that create a `PsyanimFirebaseBrowserClient` and assign it as the `document writer` of the PsyanimJsPsychPlugin:
+
+```js
+const firebaseClient = new PsyanimFirebaseBrowserClient(firebaseJsonConfig);
+PsyanimJsPsychPlugin.setDocumentWriter(firebaseClient);
+```
+
+Now, if you navigate to your Firestore console in one Chrome tab (in [Firebase Setup tutorial](/overview/firebase_setup.md), as described in Firebase Setup tutorial), you should see your database is empty (unless you've already run some experiments before doing this tutorial).
+
+Open up another tab and load your experiment page.  As you run through the experiment, you can refresh your Firestore console page to see there are new firebase documents being added to the `trial-metadata` collection.
+
+Great work!  To recap, getting the PsyanimJsPsychPlugin writing data out to `Google Firebase Firestore` during an experiment was as easy as:
+
+1) Adding a valid `firebase.config.json` to your project
+2) Uncommenting a few lines of auto-generated code in `index.js` to create a firebase client and set it as a `document writer` for the `PsyanimJsPsychPlugin`
+
+## 4. PsyanimJsPsychPlugin Experiment Database Schema
+
+Let's walk through some of the high-level structure of the Psyanim-2 database schema.
+
+Every jsPsych trial that uses the `PsyanimJsPsychPlugin` will write out a single document to the `trial-metadata` collection which contains all of the necessary information for reproducing that particular experiment's trial.
+
+So, the `trial-metadata` collection's documents are the most critical documents for understanding how all other data in our database is related.
+
+If you click on one of the documents in the Firebase console and collapse all of it's fields, you'll see two top-level fields: `data` and `time`.
+
+The top-level `data` field contains all of the data for that document and the `time` is just the timestamp when that document was last modified.
+
+If you expand the `data` field for a given document in the `trial-metadata` collection, you'll see that there are many sub-fields.
+
+For a detailed breakdown of the contents of the `data` field, checkout out that section in our [Database Schema](/overview/database_schema.md#_2-trial-metadata-collection) docs.
+
+Aside from the `trial-metadata` collection, Psyanim-2 has several other types of document collections it uses such as `animation-clips`, `session-logs`, `state-logs`, etc.
+
+We will encounter some of these in the next tutorial.
