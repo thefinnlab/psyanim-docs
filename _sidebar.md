@@ -4,6 +4,7 @@
 ---
 * [Hello Psyanim 2.0](/overview/hello_psyanim_2.md "Hello Psyanim 2.0")
 * [Interactive Chase Example](/overview/interactive_example.md "Interactive Chase")
+* [Passive Viewing Example](/overview/passive_viewing_example.md "Passive Viewing")
 ---
 * [Firebase Setup](/overview/firebase_setup.md "Firebase Setup")
 ---
