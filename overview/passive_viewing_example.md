@@ -147,7 +147,7 @@ Great work - you've setup a predator-prey v2 experiment project that you can use
 
 ## 3. Quality-Control with Experiment Viewer
 
-In the previous section, we created an experiment project to generate agent trajectories that we saved to Firebase so that we can QC these simulated trajectories before deploying them in an online experiment.
+In the previous section, we created an experiment project to generate agent trajectories (`step 1`) that we saved to Firebase so that we can QC these simulated trajectories (`step 2`) before deploying them in an online experiment (`step 3`).
 
 The next step in this process is to select the simulated trajectories which satisfy the needs of our current experiment.
 
@@ -155,7 +155,174 @@ Not all simulated trajectories will meet the needs of each experiment, so it's n
 
 To do this, a tool called `Psyanim Experiment Viewer` has been developed with two goals in mind:
 
-1. Provide researchers with an easy way to playback trajectories stored in Firebase
+1. Provide researchers with an easy way to playback trajectories stored in Firebase for visual analysis
 2. Provide researchers with a means to select trajectories to add to a `Trial Collection File`, in context with visualization
 
-// TODO: need to add section on how to use psyanim-cli to do firebase queries, using sample queries to demonstrate!
+--- 
+
+To get started, let's clone the [Psyanim Experiment Viewer](https://github.com/thefinnlab/psyanim-experiment-viewer) repository using the following command from a parent directory in your terminal:
+
+```bash
+git clone https://github.com/thefinnlab/psyanim-experiment-viewer.git
+```
+
+Navigate into the directory of the git repo you just cloned and copy your `service-account.json` file for your `Firebase Firestore` project into the root of your local experiment viewer repository.
+
+This `service-account.json` file allows Psyanim Experiment Viewer to access the data in your Firestore database.
+
+Psyanim Experiment Viewer has a client-server architecture, so part of it will run in `nodejs` and the other part of the software will run in your `Chrome browser`.
+
+The part running in `nodejs` is referred to as the `server` and the part running in the `Chrome browser` is referred to as the `client`.
+
+To run `psyanim experiment viewer`, we must first build the client with the following command in terminal:
+
+```bash
+npm run build
+```
+
+Then, we just need to start the server with the following command:
+
+```bash
+npm run serve
+```
+
+Now, you should be able to navigate to `localhost:7000` in your Chrome browser to run the experiment viewer app.
+
+You should be able to view the animations for trials in your database using `j` and `k` keys to cycle through them and `spacebar` to restart the current animation.
+
+---
+
+Note that the experiment viewer app server loads trial + animation clip data from firestore when you start the server (using the `npm run serve`) command.
+
+By default, experiment viewer's server will load all trial data from Firestore when you start it.
+
+If the data in your database changes, or you want to load a different subset of the data for viewing, you'll need to `restart` your experiment viewer server.
+
+To restart the app server, kill the server process in your terminal (with `ctrl+c`) and then start it with `npm run serve` again.
+
+If you want to load just a subset of the data from your Firestore database for viewing, you can create a `custom dataprovider` to filter out what data experiment viewer should load.
+
+We can also create custom queries to run against our Firebase database using `Psyanim-CLI` to quickly add/edit or retrieve data from firebase via a simple nodejs script.
+
+In the next sections, we'll learn how to create and perform custom queries with `Psyanim-CLI` and how to create `custom dataproviders` to filter data loaded by experiment viewer.
+
+## 4. Firebase Query Scripts
+
+`Psyanim-CLI` has the ability to run custom `query scripts` against your Firebase Firestore instances, allowing users to read, edit, and write data to/from Firebase cloud instances.
+
+In this section, we'll write some existing sample data on our local disk out to our Firebase instances.
+
+The data contains `trial-metadata` & `animation-clip` collections that we can use in our experiments.
+
+Run the following command in your terminal to create a custom query script that we can add our own logic to:
+
+```bash
+psyanim asset:query -o ./queries restoreCloudDB
+```
+
+The query script that's auto-generated comes with some example code of how to process args/options in your script, as well as how to use the `db` instance from the [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup).
+
+Let's go ahead and delete the body of the `psyanimCliQuery()` function, so it looks like this:
+
+```js
+export function psyanimCliQuery(db, args, options) {
+
+};
+```
+
+This is the basic form of a firebase query in psyanim-cli.  The query lives in a `query script` nodejs module that should export a single function named `psyanimCliQuery`.
+
+That function should accept 3 arguments:
+
+- `db`: A database instance from the `Firebase Admin SDK`
+- `args`: A list of command-line arguments for the script
+- `options`: A dictionary of options
+
+// TODO: we're going to build the restoreCloudDB script from scratch!
+
+Add the following imports at the top of the query script file, before we export the `psyanimCliQuery()` function:
+
+```js
+import fs from 'fs';
+import path from 'path';
+```
+
+Add the following code to the body of the `psyanimCliQuery()` function:
+
+```js
+export function psyanimCliQuery(db, args, options) {
+
+    if (args.length == 0)
+    {
+        console.error("ERROR: no database file path provided!");
+        return;
+    }
+
+    let rootDir = path.resolve(args[0]);
+
+    let loadCollection = (collectionName) => {
+
+        let docObjects = [];
+    
+        let collectionDir = path.join(rootDir, collectionName);
+    
+        if (!fs.existsSync(collectionDir))
+        {
+            console.warn("Directory doesn't exist: ", collectionDir);
+            return null;
+        }
+    
+        fs.readdirSync(collectionDir)
+            .forEach((fileName) => {
+    
+                let docFilePath = path.resolve(path.join(collectionDir, fileName));
+    
+                let docId = path.parse(fileName).name;
+    
+                let docData = JSON.parse(fs.readFileSync(docFilePath));
+    
+                docObjects.push({
+                    id: docId,
+                    docData: docData
+                });
+            });
+    
+        return docObjects;
+    }
+    
+    let writeCollectionToFirestore = (db, collectionName, docObjects) => {
+    
+        docObjects.forEach((docObject) => {
+            db.collection(collectionName)
+                .doc(docObject.id)
+                .set(docObject.docData);
+        });
+    };
+    
+    let pushLocalCollectionToFirestore = (db, collectionName) => {
+    
+        let docObjects = loadCollection(collectionName);
+    
+        if (!docObjects) {
+    
+            console.warn('Failed to push collection to firestore: ', collectionName);
+            return;
+        }
+    
+        writeCollectionToFirestore(db, collectionName, docObjects);
+    };
+    
+    pushLocalCollectionToFirestore(db, 'trial-metadata');
+    pushLocalCollectionToFirestore(db, 'animation-clips');
+    pushLocalCollectionToFirestore(db, 'state-logs');
+    pushLocalCollectionToFirestore(db, 'session-logs');
+    pushLocalCollectionToFirestore(db, 'jspsych-experiment-data');
+};
+```
+
+This code loads the Firestore documents from the local disk and writes them to the cloud via the `db` instance passed to the `psyanimCliQuery()` function.
+
+## 5. Custom Data Providers
+
+
+## 6. 
