@@ -342,14 +342,7 @@ Take a look at your [Firebase Console](https://console.firebase.google.com/) `Cl
 
 Let's restart experiment viewer's server and then navigate to `localhost:7000` in our Chrome browser to view the data.
 
-As you browse the various trials that are loaded, you should notice the following user IDs in the data-set:
-
-- UserA
-- UserB
-- UserC
-- UserD
-- UserE
-- Jason
+As you browse the various trials that are loaded, you should notice the following user IDs in the data-set: `UserA`, `UserB`, `UserC`, `UserD`, `UserE`, and `Jason`.
 
 `Jason` is the user ID from the passive-viewing experiment we created and ran.
 
@@ -434,6 +427,53 @@ There are many ways you can filter the data, and even do local filtering, but th
 
 // TODO: add video walkthrough
 
-## 6. 
+## 6. Selecting Trials for Playback
 
+In the previous sections, we created an experiment project to simulate `predator-prey v2` interactions and save the results of those experiment runs off to Firebase.
 
+We also added some extra test data to our Firebase data from the experiment viewer's sample datasets.
+
+In this section, we'll create a new experiment project and treat it as if we are actually going to deploy it online for test subjects to participate in.
+
+In this new experiment, we'll playback previously recorded trials selected from those that already exist in our Firebase cloud instance.
+
+To select which trials we want to include for playback in this new experiment, we'll use `Psyanim Experiment Viewer` to view previously recorded trials and save them to a `Trial Collection File`.
+
+A `Trial Collection File` contains references to a collection of trials that exist in Firebase.  You can then playback all the trials in a `Trial Collection File` using a `PsyanimJsPsychExperimentPlayer` component.
+
+Before we proceed to setting up the new experiment project, let's use the experiment viewer app to select which trials we want in our upcoming experiment.
+
+Navigate to your local experiment viewer app repo in a terminal and let's create a new custom data provider to filter our selection of trials down to just those from `UserA` and `Jason`.
+
+To do so, run the following command in your terminal:
+
+```bash
+psyanim asset:dataprovider myUserAJasonDataProvider -o ./dataproviders
+```
+
+Next, replace the contents of `myUserAJasonDataProvider.js` with the following code:
+
+```js
+export function dataProvider(firebaseClient, dataHandler) {
+
+    let userIDsToLoad = ['UserA', 'Jason'];
+
+    firebaseClient.db
+        .collection('trial-metadata') // get documents in 'trial-metadata' collection
+        .where('data.userID', 'in', userIDsToLoad) // only load docs with user ID in 'userIDsToLoad' array
+        .get() // perform the query
+        .then((querySnapshot) => {
+
+            // when the query is complete, pass the docs returned in the querySnapshot to our 'dataHandler'
+            dataHandler(querySnapshot.docs);
+        });
+};
+```
+
+Now, we can start the experiment viewer server with the dataprovider we just created, using the following command:
+
+```bash
+npm run serve -- ./dataproviders/myUserAJasonDataProvider.js
+```
+
+// TODO: user needs to open app in browser and add trials to collection file

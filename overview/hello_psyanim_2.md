@@ -6,7 +6,7 @@
 
 ***You'll need to make sure you have `read` access to our `psyanim-2` and `psyanim-cli` private git repos***
 
-`Psyanim 2.0` is a framework for creating browser-based psychology / cognitive science research experiments involving 2D procedural animation.
+`Psyanim 2.0` is a framework for creating browser-based psychology / cognitive science research experiments involving Artificial Intelligence (AI) for Games and 2D procedural animation.
 
 `Psyanim-CLI` is a tool for creating & managing experiment projects and assets in `Psyanim 2.0`.
 
@@ -16,7 +16,11 @@ If not installed already, you can install psyanim-cli package globally from git 
 npm install -g git+https://github.com/thefinnlab/psyanim-cli.git
 ```
 
-// TODO: add video + caption!
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/hello-psyanim2-section1.mp4" type="video/mp4">
+    </video>
+</p>
 
 ## 2. Creating A New Project & First Scene
 
@@ -89,9 +93,13 @@ You should see two circular shaped agents in this trial, where the predator occa
 
 The agent being pursued is the prey, and it will turn blue/yellow when it attempts to evade the predator.
 
-// TODO: add video + caption!
-
 When you are done watching the predator-prey interactions, you can progress through the rest of the trials using the `enter` key.
+
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/hello-psyanim2-section2.mp4" type="video/mp4">
+    </video>
+</p>
 
 Great work - you've successfully setup a `Psyanim-2` experiment with a `predator-prey v2` trial!
 
@@ -113,10 +121,8 @@ Aside from these files, there are some files that researchers may be interested 
 
 - <ins>*index.html*</ins>: This is the actual HTML file for the page the experiment runs on.  This is mostly controlled by `psyanim-2` and `jsPsych`, so it shouldn't need to be edited directly during basic usage.
 - <ins>*package.json & package-lock.json*</ins>: These are for package management, and should mostly be updated automatically.
-- <ins>*other firebase\* files*</ins>: These are related to `psyanim-2`'s `firebase` integration, and should be left alone.
+- <ins>*other firebase files*</ins>: These are related to `psyanim-2`'s `firebase` integration, and should be left alone.
 - <ins>*webpack.config.js*</ins>: This file controls the behavior of `webpack` and should only be modified by advanced users.
-
-// TODO: add video + caption!
 
 ## 4. Core Concepts: Psyanim Scenes
 
@@ -194,8 +200,6 @@ In `index.js` of the experiment we created in the previous section, you will see
 
 We will discuss these in greater detail in later sections, but for now, it's enough to know that they are essentially the `glue` between `Psyanim-2` and a `jsPsych experiment`.
 
-// TODO: add video + caption!
-
 ## 5. Adding Template Scenes
 
 While `psyanim-2` was designed to be extremely flexible and extensible with its [component architecture](https://gameprogrammingpatterns.com/component.html), you don't need to start from empty scenes.
@@ -254,8 +258,12 @@ If you reload the experiment in your browser, the 3rd jsPsych trial that plays w
 
 In this trial, you should see two green circle-shaped agents wandering about, then turning red as they charge at each other and purple as they separate to create distance between each other.
 
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/hello-psyanim2-section5.mp4" type="video/mp4">
+    </video>
+</p>
+
 Great work - you've added a template scene definition to your experiment project using psyanim-cli!
 
 Remember, you can always run `psyanim template -h` to see the help menu for template scene generation, including a list of available subcommands for the various templates.
-
-// TODO: add video + caption!
