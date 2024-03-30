@@ -129,7 +129,7 @@ interactivePredatorMouseV2Trial2.setEntityShapeParameter('predator', 'radius', 1
 timeline.push(interactivePredatorMouseV2Trial2.jsPsychTrialDefinition);
 ```
 
-Notice that we modified the second parameter to the `PsyanimJsPsychTrial` constructor os it passes the original scene's key, but with a '2' appended to it.
+Notice that we modified the second parameter to the `PsyanimJsPsychTrial` constructor as it passes the original scene's key, but with a '2' appended to it.
 
 This is because the first argument to the `PsyanimJsPsychTrial` constructor is the scene definition object for the trial, while the second argument is a `unique key` associated with that scene and it's parameter-set.
 
@@ -139,7 +139,7 @@ To modify the parameters of the scene definition for the second trial, the trial
 
 For this trial, we use the `setEntityShapeParameter()` method, which allows us to modify any of the `shape parameters` of any `entity` in our scene definition.
 
-For this trial, we'll change the `shapeType` of our `predator` entity to be a circle, and specify it's `radius` to be 12px.
+We'll also change the `shapeType` of our `predator` entity to be a circle, and specify it's `radius` to be 12px.
 
 ---
 
@@ -165,7 +165,7 @@ In the first trial and third trials, you should see a triangle-shaped predator a
 
 In the second trial, you should see a circle-shaped agent.
 
-The first two trial's parameters are the same, except for the shape of the agent.
+The first two trials' parameters are the same, except for the shape of the agent.
 
 The third trial has the same shape as the first, but the agent should be moving significantly faster.
 
@@ -195,7 +195,7 @@ In the code above, we declare an array of subtlety values we'd like to create tr
 
 These subtlety angles are angles defined with respect to a line from the predator to it's target prey.
 
-The predator will approach the prey during a 'charge' with some degree of subtlety, where the angle of approach is somewhere between 0 degrees (head-on) or some random value no larger than the `subtlety` paramater.
+The predator will approach the prey during a 'charge' with some degree of subtlety, where the angle of approach is somewhere between 0 degrees (head-on) or some random value no larger than the `subtlety` parameter.
 
 The subtlety values represent a maximum angle between the line of sight from predator-to-prey and the actual direction the predator will move in.
 
@@ -237,7 +237,7 @@ Next, let's open our `index.js` and uncomment the following `import` statement n
 import firebaseJsonConfig from '../firebase.config.json';
 ```
 
-Next, under the section with the code comment `Setup PsyanimJsPsychPlugin`, uncomment the following two lines that create a `PsyanimFirebaseBrowserClient` and assign it as the `document writer` of the PsyanimJsPsychPlugin:
+Then, under the section with the code comment `Setup PsyanimJsPsychPlugin`, uncomment the following two lines that create a `PsyanimFirebaseBrowserClient` and assign it as the `document writer` of the PsyanimJsPsychPlugin:
 
 ```js
 const firebaseClient = new PsyanimFirebaseBrowserClient(firebaseJsonConfig);
@@ -281,7 +281,7 @@ We will encounter some of these in the next tutorial.
 
 ## 5. Deploying Experiments
 
-Now that we've created and tesetd our experiment, it's ready for deployment on the internet where test subjects can use it to participate in the experiment.
+Now that we've created and tested our experiment, it's ready for deployment on the internet where test subjects can use it to participate in the experiment.
 
 `Psyanim-2` experiments using `jsPsych` are bundled into a single static webpage that can be deployed anywhere that will host a static site.
 
