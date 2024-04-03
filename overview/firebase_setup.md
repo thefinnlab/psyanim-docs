@@ -110,14 +110,71 @@ We will take this javascript object on the right-hand side of the assignment sta
 
 Keep this `firebase.config.json` file somewhere safe.  You will copy it into any psyanim-2 experiment projects you create to give those projects access to your Firebase Firestore database.
 
-## TODO: walk through firebase firestore database structure (collections & docs)
+## 5. Firestore Database Structure
 
-[Managing Cloud Firestore with Firebase Console](https://firebase.google.com/docs/firestore/using-console)
+<p align="center">
+    <a href="https://www.youtube.com/watch?v=v_hR4K4auoQ" target="_blank">
+      <img src="https://img.youtube.com/vi/v_hR4K4auoQ/0.jpg" alt="Firebase NoSQL Video"/>
+    </a>
+</p>
 
-## TODO: Firebase cli installation and login process
+[`Cloud Firestore`](https://firebase.google.com/docs/firestore/data-model) is a NoSQL, document-oriented database.  Basically, the database is composed of any number of `collections` of `documents`, where each document is a set of key-value pairs.
 
-[Firebase CLI installation](https://firebase.google.com/docs/cli#install_the_firebase_cli)
+---
 
-## TODO: Firebase service-account.json setup
+Psyanim-2 adds a *very* thin abstraction layer to this, where a `Psyanim-2 database` is also a collection of `documents`, but each document is a [JSON object](https://en.wikipedia.org/wiki/JSON#Data_types).
 
-[Google Service Account Creation Docs](https://cloud.google.com/iam/docs/service-accounts-create)
+The distinction between the `Firestore` database structure and the `Psyanim-2` database structure is very subtle, maybe even trivial in most cases.  So you it's mostly OK to think of them as having the same structure.
+
+However, this stricter definition of a `Psyanim-2 document` as a `JSON object` allows us to decouple `Psyanim-2` databases from `Google Firestore`, so they can be easily migrated to flat-files on the local disk, or even other NoSQL database services.
+
+---
+
+In `Cloud Firestore`, a document is uniquely identified within the database by a `path`.  This path is composed of collection / subcollection names and document name related to a particular document.
+
+The Firebase console is a powerful tool for exploring the structure of any Firestore database.
+
+You can view, add, edit, delete, and query data in your database via a graphical user interface.
+
+You can also view / edit the security rules for external clients accessing the database (only recommended for advanced users).
+
+You can also monitor the database usage.
+
+The most common use of the Firebase console for researchers will likely be viewing data and performing queries via the GUI.
+
+Check out these [docs](https://firebase.google.com/docs/firestore/using-console) for more information on managing Cloud Firestore with the Firebase Console.
+
+## 6. Firebase CLI Tools
+
+Firebase comes with a collection of powerful tools, called `Firebase CLI`, that can be used via a command-line interface.
+
+The tools have a broad and robust feature-set, allowing you to manage, view and deploy Firebase projects from the command-line on your development machine.
+
+While the `Firebase-CLI` can be used to run queries against your Firestore database, update security rules, etc., in `Psyanim-2`, the most useful aspect of `Firebase CLI` is the ability to run an instance of a Firebase emulator locally for testing using the [Firebase Local Emulator Suite](https://firebase.google.com/docs/emulator-suite).
+
+For more information about this capability, check out the [docs](https://firebase.google.com/docs/emulator-suite).
+
+---
+
+For now, let's just get the `Firebase CLI` installed so it's available for us to use during development.
+
+The installation process is slightly different depending on what platform you are using.
+
+To install the `Firebase CLI`, follow the instructions [here](https://firebase.google.com/docs/cli#install_the_firebase_cli).
+
+Once installed, you'll need to 'login' with the Firebase CLI in order for it to have access to your Cloud Firebase project.
+
+To do so, follow the steps [here](https://firebase.google.com/docs/cli#sign-in-test-cli).
+
+Basically, running `firebase login` will open a web-page that allows you authenticate from your logged-in Google account, granting the `Firebase CLI` tool access to your Firebase Cloud Project.
+
+## 7. Google Cloud Service Account Setup
+
+In order to give `Psyanim Experiment Viewer` and `Psyanim-CLI` access to your `Firebase Cloud project`, you'll need to setup a `Google Service Account` and obtain a `key` file associated with that account.
+
+A `Google Service Account` is an account with Google that allows applications (in this case, `psyanim-2` apps) to use allowed Google web services via API calls with a simple authentication mechanism, all of which can be managed by an admin in the Google Cloud web interface.
+
+// TODO: explain Identity and Access Management (IAM) APIs
+
+Detailed information on creating `service accounts` can be found in [Google Service Account Creation Docs](https://cloud.google.com/iam/docs/service-accounts-create), but we'll walk through the high-level process here.
+
