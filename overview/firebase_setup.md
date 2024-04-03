@@ -124,7 +124,7 @@ Keep this `firebase.config.json` file somewhere safe.  You will copy it into any
 
 Psyanim-2 adds a *very* thin abstraction layer to this, where a `Psyanim-2 database` is also a collection of `documents`, but each document is a [JSON object](https://en.wikipedia.org/wiki/JSON#Data_types).
 
-The distinction between the `Firestore` database structure and the `Psyanim-2` database structure is very subtle, maybe even trivial in most cases.  So you it's mostly OK to think of them as having the same structure.
+The distinction between the `Firestore` database structure and the `Psyanim-2` database structure is very subtle, maybe even trivial in most cases.  So it's mostly OK to think of them as having the same structure.
 
 However, this stricter definition of a `Psyanim-2 document` as a `JSON object` allows us to decouple `Psyanim-2` databases from `Google Firestore`, so they can be easily migrated to flat-files on the local disk, or even other NoSQL database services.
 
