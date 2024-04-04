@@ -15,12 +15,12 @@ Cloud Firestore essentially serves as a convenient, secure backend database for 
 To use Firebase Firestore in your psyanim-2 experiments, there are several tasks related to Firebase setup that you'll need to complete:
 
 - Setup a Firebase Cloud Project
+- Setup a Firestore Database in your Firebase Cloud Project
 - Add an app that can access your Firebase resources
-- Download a Firebase Config File for use in your experiment project
-- Setup a Google Service Account
-- Download a service account key file for use with psyanim-CLI and Experiment Viewer
+- Install `Firebase CLI` Tools
+- Setup a Google Service Account so any app can access your Google Cloud Resources
 
-There are two files we'll need at the end of this process:
+Aside from having `Firebase CLI` installed and authenticated with your Google account, here are two files we'll need at the end of this process:
 
 - `firebase.config.json`: A file that contains the necessary info for your experiment app to access Firebase resources
 - `service-account.json`: This file contains a key necessary for psyanim-CLI and Experiment Viewer to access Firebase resource
@@ -170,11 +170,42 @@ Basically, running `firebase login` will open a web-page that allows you authent
 
 ## 7. Google Cloud Service Account Setup
 
+> Detailed information on creating `service accounts` can be found in [Google Service Account Creation Docs](https://cloud.google.com/iam/docs/service-accounts-create), but we'll walk through the high-level process here.
+
 In order to give `Psyanim Experiment Viewer` and `Psyanim-CLI` access to your `Firebase Cloud project`, you'll need to setup a `Google Service Account` and obtain a `key` file associated with that account.
 
-A `Google Service Account` is an account with Google that allows applications (in this case, `psyanim-2` apps) to use allowed Google web services via API calls with a simple authentication mechanism, all of which can be managed by an admin in the Google Cloud web interface.
+An `IAM Service Account` is an account with Google that allows applications (in this case, `psyanim-2` apps such as `Psyanim Experiment Viewer` and `psyanim-CLI`) to use allowed Google web services via API calls with a simple authentication mechanism, all of which can be managed by an admin in the Google Cloud web interface.
 
-// TODO: explain Identity and Access Management (IAM) APIs
+You can read more about IAM service accounts [here](https://cloud.google.com/iam/docs/service-account-overview).
 
-Detailed information on creating `service accounts` can be found in [Google Service Account Creation Docs](https://cloud.google.com/iam/docs/service-accounts-create), but we'll walk through the high-level process here.
+The first thing you'll need to do is enable the IAM APIs for your project.
 
+Navigate to the following page [Create Service Accounts](https://cloud.google.com/iam/docs/service-accounts-create) and click the `Enable the API` button under the `Before you begin` section.
+
+On the `Confirm Project` step on that page, make sure you have selected the Firebase project ID we just created, in the dropdown shown in the image below:
+
+<p align="center" style="font-size: 12px;">
+    <img src="./imgs/iam_enable_access_page.png"/>
+</p>
+
+NOTE: if you attempt to change the project by clicking the drop-down and selecting your new project by ID, and then you get an error on that page, just close it, return to the [Create Service Accounts](https://cloud.google.com/iam/docs/service-accounts-create) page, and click the `Enable the API` button again.
+
+Once you've done this, navigate to [Google Cloud Console](https://console.cloud.google.com), click the `IAM and Admin` link, then click `Service Accounts` on the left, and verify that your project ID is showing in the dropdown on the top-left (just as in the previous image where we enabled the `IAM API`).
+
+In the table showing `Service accounts for project [projectId]`, you should see a service account named `firebase-adminsdk`.
+
+Click the 3 dots under the `Actions` column for this service account and click `Manage Keys` in the drop-down menu.
+
+On the next page, click the `ADD KEY` button and select `Create new key` from the drop-down menu.
+
+In the dialog box that comes up, make sure `JSON` is selcted and click `CREATE`.
+
+You should see a pop-up that says, `Private key saved to your computer` and a file download should start.
+
+This file is your service account key.  Keep it in a safe place, as it can allow anyone to access / modify your Google account via the web APIs.
+
+Should you feel this key has been compromised, you can always return to this `IAM & Admin` web UI and delete any keys you no longer want around.
+
+Make a copy of this key and call it `service-account.json`.  Keep this in a safe place too, for now.
+
+This is what we will use in `Psyanim Experiment Viewer` project and anytime we use `Psyanim-CLI`'s Firebase query features.

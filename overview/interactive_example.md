@@ -223,6 +223,8 @@ The last 3 trials are our `chase-subtlety` experiment trials, where the subtlety
 
 To start saving data to a `Google Firebase Firestore` database, there are just a few quick setup steps.
 
+> Note that, if this is your first time ever using the `PsyanimJsPsychPlugin` to record data to firebase (i.e. your database is freshly setup and never used before), you'll also need to update the database security rules.  We will see how to do this later in this section.
+
 At a high-level, the only thing that needs to be done to enable saving `trial metadata` out to firebase is for the `PsyanimJsPsychPlugin`'s `documentWriter` property to be set to a valid document writer.
 
 For firebase, the document writer we'll want to use is the `PsyanimFirebaseBrowserClient`.
@@ -244,6 +246,15 @@ const firebaseClient = new PsyanimFirebaseBrowserClient(firebaseJsonConfig);
 PsyanimJsPsychPlugin.setDocumentWriter(firebaseClient);
 ```
 
+Finally, you'll want to copy the "projectId" value from your `firebase.config.json` to your `.firebaserc` file's "projects.default" field value, so it matches the one in your `firebase.config.json`.
+
+> If this is your first time using the `PsyanimJsPsychPlugin` to write data out to a freshly created Firestore database instance, you'll need to update the security rules of the database to allow writes to certain collections.
+> To do this, simply run the following command in terminal:
+
+```bash
+npm run firebase-deploy-rules 
+```
+
 Now, if you navigate to your Firestore console in one Chrome tab (in [Firebase Setup tutorial](/overview/firebase_setup.md), as described in Firebase Setup tutorial), you should see your database is empty (unless you've already run some experiments before doing this tutorial).
 
 Open up another tab and load your experiment page.  As you run through the experiment, you can refresh your Firestore console page to see there are new firebase documents being added to the `trial-metadata` collection.
@@ -252,6 +263,9 @@ Great work!  To recap, getting the PsyanimJsPsychPlugin writing data out to `Goo
 
 1) Adding a valid `firebase.config.json` to your project
 2) Uncommenting a few lines of auto-generated code in `index.js` to create a firebase client and set it as a `document writer` for the `PsyanimJsPsychPlugin`
+3) Copy the `projectId` value from your `firebase.config.json` into your `.firebaserc`'s "projects.default" field value
+
+The 3rd step above is actually so that `Firebase CLI` calls (which some of the scripts in `package.json` make) will know what Firebase project to use.
 
 <p align="center" style="font-size: 12px;">
     <video width="640" height="360" controls>
