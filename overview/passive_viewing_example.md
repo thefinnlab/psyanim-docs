@@ -56,6 +56,17 @@ We'll also add some trial variations to make this a more realistic experiment, w
 
 First, let's copy our `firebase.config.json` into the project root directory.
 
+You'll want to copy the "projectId" value from your `firebase.config.json` to your `.firebaserc` file's "projects.default" field value, so it matches the one in your `firebase.config.json`.
+
+> If this is your first time using the `PsyanimJsPsychPlugin` to write data out to a freshly created Firestore database instance, you'll need to update the security rules of the database to allow writes to certain collections.
+> To do this, simply run the following command in terminal:
+
+```bash
+npm run firebase-deploy-rules 
+```
+
+---
+
 Next, in the experiment project we created in the previous section, open up `./src/index.js` and make some modifications.
 
 Update the `psyanim-2` import statement at the top of the file so it includes the `PsyanimFirebaseBrowserClient` and `PsyanimPredatorFSM`, as follows:
@@ -378,7 +389,7 @@ The reason we named this script `myUserACEJasonDataProvider.js` is that we want 
 
 A custom data provider exports a single function, `dataProvider()`, which accepts two arguments.
 
-The first argument is a firebase SDK client reference, where `firebaseClient.db` is a Firestore DB object reference (see: https://firebase.google.com/docs/firestore/query-data/queries).
+The first argument is a firebase SDK client reference, where `firebaseClient.db` is a Firestore DB object reference (see: https://firebase.google.com/docs/firestore/query-data/queries#web-namespaced-api).
 
 The second argument is a `dataHandler` delegate, which Psyanim Server expects your `dataProvider()` function to call, passing it an array of valid firebase document references.
 
@@ -476,4 +487,92 @@ Now, we can start the experiment viewer server with the dataprovider we just cre
 npm run serve -- ./dataproviders/myUserAJasonDataProvider.js
 ```
 
-// TODO: user needs to open app in browser and add trials to collection file
+Reload the experiment viewer app in your browser and, while cycling through the trials with `J` and `K` keys on your keyboard, you should notice that there are only trials with the user IDs: `UserA` and `Jason`.
+
+Now, as part of the QC process, we will start to add some of these trials we're viewing in the browser to a `Trial Collection File`.
+
+To do this, we just need to click the `Save Trial ID` button in the experiment viewer app in the browser whenever we come across a trial we want to use in our experiment.
+
+Every time we click the `Save Trial ID` button, it will make sure that trial is added to a file under the `trial_collections` directory in the root of our experiment viewer app project.
+
+We can create different `Trial Collection Files` to add different trials to by changing the name used in the `Trial Collection File Name` input field in the experiment viewer app.
+
+For this trial, it's OK to just use the default file name, which is `defaultTrialCollection.json`.
+
+Go ahead and add at least 3 trials from user IDs `Jason` and `UserA` to your `defaultTrialCollection.json` file.
+
+When you successfully add a trial to the trial collection file, if you look at the server's terminal, you should see a note that says: `Saved trial collection ID: <trial-ID>`.
+
+The `Trial Collection File` schema is very simple.  If you open up `./trial_collections/defaultTrialCollection.json`, you'll see it's just an array of JSON objects, with 1 object per trial.
+
+For each trial object in the `Trial Collection File` JSON array, you can also add agent names to the `excludeAgents` field of the object and those agents will be ommitted from playback in our experiment.
+
+Great work!  Now that we've selected trials from our Firebase Firestore database that we want to use in our experiments, it's time to build our experiment to play back these trials for test subjects.
+
+// TODO: add video walkthrough
+
+## 7. Creating Our Experiment
+
+Now all that's left to do is create our experiment project to deploy and playback the recorded trials that we hand-selected for our test subjects.
+
+To do this, let's create a new project directory called `passiveViewingExperiment` and navigate to it in a terminal.
+
+Run the following command to generate a new psyanim-2 project using the `experiment player` template:
+
+```bash
+psyanim init:xplayer
+```
+
+Go ahead and copy your `firebase.config.json` into the root of this new project directory so our app can access our Firebase Firestore database, and copy the `projectId` value from your `firebase.config.json` into the `projects.default` value of the `.firebaserc` file.
+
+The next thing to do is copy the `Trial Collection File` we created in the previous section into the `./src` directory of this app.  Though you could really put this file anywhere in this project, we'll put it in `./src` for now.
+
+And that should be it!  The `experiment player template project` is designed to playback your `Trial Collection File` out of the box!
+
+Start a watch service in one terminal using `npm run watch` to keep your code bundled and then start up the dev server with `npm run serve` in another terminal and load your experiment in the browser at `localhost:3000`.
+
+You should see each trial play with an `HTML Keyboard Response` trial waiting for a keypress in between each one.
+
+---
+
+Let's open up our `index.js` under the `./src` directory and take a quick peek at how this experiment is setup.
+
+Out-of-the-box, Psyanim 2 comes with `components` and `template scenes` that allow us to quickly setup `real-time playback` of any recorded `trial` in `firebase` during an experiment.
+
+If you peek at the `psyanim2` package imports at the top of the `index.js`, notice the trial loaders and scene templates at the end of the list.
+
+The `PsyanimJsPsychTrialLoader` is a `Psyanim Component` that loads the data for our experiment from `firestore` on startup.
+
+The `PsyanimJsPsychTrialSelector` is a `Psyanim Component` that randomly samples trials (without replacement) to be played back one at a time during the experiment.
+
+The `PsyanimJsPsychExperimentLoadingSceneTemplate` is a template scene we can use to load all of the trials that will be used in our experiment.
+
+The `PsyanimJsPsychExperimentPlayerSceneTemplate` is a template scene we can use to playback any trial in our experiment.
+
+The template scenes are there to minimize the boiler-plate you have to write, since all loading & playback scenes will look very similar, if not the same.
+
+Feel free to craft these by hand if you want to understand things better or customize them though!
+
+Everything else in the `index.js` should be familiar to you, so we can skip ahead to where we setup the `experiment loader scene trial` and the `main playback scene trials`.
+
+The `experiment loader scene trial` has to run *before* any `trials` can be played back from `firestore`.
+
+It only has 2 parameters you need to configure on the `PsyanimJsPsychTrialLoader` component - `trialInfo` and `documentReader`.
+
+The `trialInfo` is just an array of trial objects from your `Trial Collection Files`.  The `documentReader` is just the `firebase client` reference.
+
+The `main playback scene trials` are the trials that will actually play back data from `firestore`.
+
+This scene only has 1 parameter on a `PsyanimJsPsychTrialSelector` component that you need to configure - `trialInfo`.
+
+The `trialInfo` here is also just an array of objects from your `Trial Collection Files`.
+
+---
+
+And this wraps up the last of the main `psyanim-2` user-facing tutorials!
+
+In this tutorial, we created an experiment project specifically to simulate and record many variations of agent trajectories, QC'd them in Psyanim Experiment Viewer, and then created an experiment project to play them back for test subjects.
+
+Great work!  There's still a lot more to learn and many more features we couldn't discuss here.
+
+A great way to keep exploring is to create new experiments, scenes and components, and dive into some of the `psyanim-2 core` code itself.

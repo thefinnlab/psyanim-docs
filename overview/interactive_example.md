@@ -255,7 +255,7 @@ Finally, you'll want to copy the "projectId" value from your `firebase.config.js
 npm run firebase-deploy-rules 
 ```
 
-Now, if you navigate to your Firestore console in one Chrome tab (in [Firebase Setup tutorial](/overview/firebase_setup.md), as described in Firebase Setup tutorial), you should see your database is empty (unless you've already run some experiments before doing this tutorial).
+Now, if you navigate to your Firestore console in one Chrome tab (as described in [Firebase Setup tutorial](/overview/firebase_setup.md)), you should see your database is empty (unless you've already run some experiments before doing this tutorial).
 
 Open up another tab and load your experiment page.  As you run through the experiment, you can refresh your Firestore console page to see there are new firebase documents being added to the `trial-metadata` collection.
 
