@@ -277,7 +277,7 @@ An example of this data looks like:
 }
 ```
 
-## 6. Expected Database Size and Transaction Costs for An Experiment
+## 7. Expected Database Size and Transaction Costs for An Experiment
 
 Google Firebase Firestore databases charge for document reads, writes and deletes.  Thus, when estimating the cost of running an experiment, it is helpful to have an idea of how many document reads and writes will be done per experiment.
 

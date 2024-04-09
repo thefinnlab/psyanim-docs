@@ -1,24 +1,12 @@
-# <ins>Getting Started with Psyanim 2.0</ins>
+# <ins>Hello Psyanim Development</ins>
 
-***Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2).***
+***It is recommended to complete the [User Tutorials](/overview/hello_psyanim_2.md) before proceeding with the developer tutorials.***
 
-## 1. Core concepts
+## 1. Overview and Project Setup
 
-## 2. Creating a new Psyanim 2 Project
+In this tutorial, we'll get more familiar with `Psyanim Scenes`, `Entities` and `Components` with some hands-on practice.
 
-***Pre-requisites: Requires [NodeJS](https://nodejs.org/en) v18.16.0+, an up-to-date installation of [Git](https://git-scm.com/), and [Psyanim-CLI](https://github.com/thefinnlab/psyanim-cli.git) installed globally.***
-
-***You'll need to make sure you have read access to our psyanim-2 and psyanim-cli private git repos***
-
-If not installed already, you can install psyanim-cli package globally from git repo via npm with the following command:
-
-```bash
-npm install -g git+https://github.com/thefinnlab/psyanim-cli.git
-```
-
----
-
-Create a directory named `hello-psyanim2` and navigate to it in your terminal.
+Create a project directory called `hello-psyanim-dev` and navigate to it in your terminal.
 
 Create a new `psyanim-2` experiment project with:
 
@@ -26,13 +14,9 @@ Create a new `psyanim-2` experiment project with:
 psyanim init
 ```
 
-`psyanim init` will create a new git repository containing a blank `psyanim-2` experiment project.
+## 2. Our First Custom Component
 
-At this stage, we have an experiment with just one empty scene.  Let's add another scene.
-
-## 3. Creating our first scene using psyanim-cli
-
-Let's get familiar with `Psyanim Scenes`, `Psyanim Entities` and `Psyanim Components` by building a simple scene with a red circle entity that moves back and forth as if patrolling between two points.
+Now, let's get familiar adding custom logic to our scenes by building a simple scene with a red circle entity that moves back and forth as if patrolling between two points.
 
 Back in the terminal, run the following command to create a scene named 'MyFirstScene':
 
@@ -155,17 +139,7 @@ Notice we add our `MyFirstMovementComponent` to our `agent1` entity by adding a 
 
 ---
 
-In a terminal, start a watch service to watch your code for changes with:
-
-```bash
-npm run watch
-```
-
-In a separate terminal, start up a local server to host your code on port 3000 with:
-
-```bash
-npm run serve
-```
+Startup a watch service with `npm run watch` and a dev server in another terminal with `npm run serve`.
 
 Navigate to `localhost:3000` in your web browser and you should be able to play through your experiment, with the `MyFirstScene` trial showing the following:
 
@@ -173,7 +147,7 @@ Navigate to `localhost:3000` in your web browser and you should be able to play 
   <img src="./imgs/getting_started_final_result.gif" />
 </p>
 
-## 4. Scenes and Entities
+## 3. Scenes and Entities
 
 Let's create another scene to get more familiar with `Psyanim Scenes` and `Psyanim Entities`.
 
@@ -325,7 +299,7 @@ Reload your experiment in the browser and you should be able to move the player 
 
 Great work - you should see the evade agent avoiding the player entity as you move around your scene!
 
-## 5. Entities and Components
+## 4. Entities and Components
 
 To dive a bit deeper into how to configure `components` in `entity definitions` within our `scene definition`, let's put together another `scene` where an agent follows our mouse cursor around during the `trial`.
 
@@ -512,7 +486,7 @@ This `target` field specifies the `entity` we want this `PsyanimArriveAgent` to 
 
 Great work!  Reload your scene in the browser - you should see the triangle-shaped `agent` entity following your `mouseFollowTarget` as you move your mouse around!
 
-## 6. Entity Prefabs
+# 5. Entity Prefabs
 
 In the last section on `Entities and Components`, we created a scene with an `Arrive Agent` that follows your mouse cursor around by adding the relevant `components` to an `entity`.
 
