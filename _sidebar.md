@@ -10,6 +10,7 @@ User Tutorials
 Developer Tutorials
 * [Hello Psyanim Development](/overview/hello_psyanim_dev.md "Psyanim Dev")
 * [Artificial Intelligence](/overview/artificial_intelligence_in_psyanim2.md "Artificial Intelligence")
+* [API Docs](/overview/psyanim_api_docs.md "API Docs")
 ---
 Data Layer
 * [Firebase Setup](/overview/firebase_setup.md "Firebase Setup")
