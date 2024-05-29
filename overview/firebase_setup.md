@@ -63,6 +63,8 @@ At the moment it is empty, so you won't see any data in the table view.
 
 ## 4. Adding an App to Firebase so your experiment can access Firestore
 
+In this section, we'll create our `firebase.config.json` file for use in our `psyanim-2` projects by copying the `firebase config` object from the `Firebase Console` page for our app.
+
 Navigate back to your [`Firebase Console`](https://console.firebase.google.com) page and select your project.
 
 On the left side-bar, click on the `Project Overview` and you should see the words 'Get started by adding Firebase to your app' on that page.

@@ -4,6 +4,12 @@
 
 ## 1. Overview and Project Setup
 
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/interactive-chase-section1.mp4" type="video/mp4">
+    </video>
+</p>
+
 In this tutorial, we'll setup a new experiment with multiple interactive trials and see how to record each trial's metadata, as well as agent and player trajectories to `Google Firebase`.
 
 The trials will involve a `predator agent` that chases the `mouse cursor` with a certain degree of `subtlety`.
@@ -41,7 +47,7 @@ The valid subcommands listed are all template scenes we can add to our project.
 Let's go ahead and add the `predatormousev2` to our scene with the following command:
 
 ```bash
-psyanim template:predatormousev2 -o .\src\scenes\
+psyanim template:predatormousev2 -o ./src/scenes/
 ```
 
 ---
@@ -81,15 +87,15 @@ timeline.push(interactivePredatorMouseV2Trial.jsPsychTrialDefinition);
 
 Make sure you have a watch service and dev server running, reload the experiment in your browser and you should see the green predator agent wandering about, occasionally turning red and charging after the mouse cursor before returning to a wander.
 
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/interactive-chase-section1.mp4" type="video/mp4">
-    </video>
-</p>
-
 Great work -  you've setup an interactive predator-chase experiment!
 
 ## 2. Creating Trial Variations
+
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/interactive-chase-section2.mp4" type="video/mp4">
+    </video>
+</p>
 
 So far, we've seen how we can create `jsPsych Trials` from `Psyanim Scene Definitions`.
 
@@ -207,19 +213,23 @@ And for a subtlety value of 180 degrees, the predator can move towards or away f
 
 ---
 
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/interactive-chase-section2.mp4" type="video/mp4">
-    </video>
-</p>
+Great work! Start a watch service in your terminal with `npm run watch` and a dev server in another terminal with `npm run serve`.
 
-Great work! Reload your experiment in the browser and you should see there are now 6 trials.
+Reload your experiment in the browser and you should see there are now 6 trials.
+
+Remember, by default, you can use the `Enter` key on your keyboard to progress to the next `jsPsych trial`.
 
 The first 3 trials share a constant subtlety parameter value.
 
 The last 3 trials are our `chase-subtlety` experiment trials, where the subtlety values are `[5, 75, 180]` in each one, respectively.
 
 ## 3. Saving Data To Firestore
+
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/interactive-chase-section3.mp4" type="video/mp4">
+    </video>
+</p>
 
 To start saving data to a `Google Firebase Firestore` database, there are just a few quick setup steps.
 
@@ -248,6 +258,16 @@ PsyanimJsPsychPlugin.setDocumentWriter(firebaseClient);
 
 Finally, you'll want to copy the "projectId" value from your `firebase.config.json` to your `.firebaserc` file's "projects.default" field value, so it matches the one in your `firebase.config.json`.
 
+e.g. if the "projectId" from your `firebase.config.json` was "myTestProject", then your `.firebaserc` should look like the following:
+
+```js
+{
+  "projects": {
+    "default": "myTestProject"
+  }
+}
+```
+
 > If this is your first time using the `PsyanimJsPsychPlugin` to write data out to a freshly created Firestore database instance, you'll need to update the security rules of the database to allow writes to certain collections.
 > To do this, simply run the following command in terminal:
 
@@ -266,12 +286,6 @@ Great work!  To recap, getting the PsyanimJsPsychPlugin writing data out to `Goo
 3) Copy the `projectId` value from your `firebase.config.json` into your `.firebaserc`'s "projects.default" field value
 
 The 3rd step above is actually so that `Firebase CLI` calls (which some of the scripts in `package.json` make) will know what Firebase project to use.
-
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/interactive-chase-section3.mp4" type="video/mp4">
-    </video>
-</p>
 
 ## 4. PsyanimJsPsychPlugin Experiment Database Schema
 

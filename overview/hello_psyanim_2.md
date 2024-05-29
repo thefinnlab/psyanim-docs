@@ -6,6 +6,10 @@
 
 ***You'll need to make sure you have `read` access to our `psyanim-2` and `psyanim-cli` private git repos***
 
+***If you're on a mac, you can setup ssh keys for github access via git cli [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)***
+
+***You may also need administrative privileges (such as 'sudo' on linux/mac) to install npm packages globally.***
+
 `Psyanim 2.0` is a framework for creating browser-based psychology / cognitive science research experiments involving Artificial Intelligence (AI) for Games and 2D procedural animation.
 
 `Psyanim-CLI` is a tool for creating & managing experiment projects and assets in `Psyanim 2.0`.
@@ -29,6 +33,8 @@ In a terminal, create a directory called `hello-psyanim2` and run the following 
 ```bash
 psyanim init
 ```
+
+***You may need to modify the file permissions in your project, depending on what user you are logged in as in your shell. If you're on a mac, follow the instruction [here](https://support.apple.com/guide/mac-help/change-permissions-for-files-folders-or-disks-mchlp1203/mac).***
 
 This command will create a blank npm project, install psyanim-2 & it's dependencies, and then setup a local git repo to keep things under version control.
 
@@ -255,6 +261,8 @@ timeline.push(playfightV2Trial.jsPsychTrialDefinition);
 Note that the `PsyanimJsPsychTrial` has a `jsPsychTrialDefinition` member that we add to the timeline.  It's the responsibility of the `PsyanimJsPsychTrial` class to handle generating a valid jsPsych trial definition for us.
 
 If you reload the experiment in your browser, the 3rd jsPsych trial that plays will be the `Playfight v2` trial.
+
+When the newly added trial is running, you should see the trial name printed in the browser console (press `F12` to open the console).
 
 In this trial, you should see two green circle-shaped agents wandering about, then turning red as they charge at each other and purple as they separate to create distance between each other.
 
