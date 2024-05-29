@@ -10,6 +10,12 @@
 
 ***You may also need administrative privileges (such as 'sudo' on linux/mac) to install npm packages globally.***
 
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/hello-psyanim2-section1.mp4" type="video/mp4">
+    </video>
+</p>
+
 `Psyanim 2.0` is a framework for creating browser-based psychology / cognitive science research experiments involving Artificial Intelligence (AI) for Games and 2D procedural animation.
 
 `Psyanim-CLI` is a tool for creating & managing experiment projects and assets in `Psyanim 2.0`.
@@ -20,13 +26,13 @@ If not installed already, you can install psyanim-cli package globally from git 
 npm install -g git+https://github.com/thefinnlab/psyanim-cli.git
 ```
 
+## 2. Creating A New Project & First Scene
+
 <p align="center" style="font-size: 12px;">
     <video width="640" height="360" controls>
-    <source src="./videos/hello-psyanim2-section1.mp4" type="video/mp4">
+    <source src="./videos/hello-psyanim2-section2.mp4" type="video/mp4">
     </video>
 </p>
-
-## 2. Creating A New Project & First Scene
 
 In a terminal, create a directory called `hello-psyanim2` and run the following command from that directory:
 
@@ -100,12 +106,6 @@ You should see two circular shaped agents in this trial, where the predator occa
 The agent being pursued is the prey, and it will turn blue/yellow when it attempts to evade the predator.
 
 When you are done watching the predator-prey interactions, you can progress through the rest of the trials using the `enter` key.
-
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/hello-psyanim2-section2.mp4" type="video/mp4">
-    </video>
-</p>
 
 Great work - you've successfully setup a `Psyanim-2` experiment with a `predator-prey v2` trial!
 
@@ -208,6 +208,12 @@ We will discuss these in greater detail in later sections, but for now, it's eno
 
 ## 5. Adding Template Scenes
 
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/hello-psyanim2-section5.mp4" type="video/mp4">
+    </video>
+</p>
+
 While `psyanim-2` was designed to be extremely flexible and extensible with its [component architecture](https://gameprogrammingpatterns.com/component.html), you don't need to start from empty scenes.
 
 `Scene definitions` can be generated for your experiment from `scene templates` using `Psyanim-CLI`.  This can serve as a quicker starting point for building new scenes based on existing ones.
@@ -265,12 +271,6 @@ If you reload the experiment in your browser, the 3rd jsPsych trial that plays w
 When the newly added trial is running, you should see the trial name printed in the browser console (press `F12` to open the console).
 
 In this trial, you should see two green circle-shaped agents wandering about, then turning red as they charge at each other and purple as they separate to create distance between each other.
-
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/hello-psyanim2-section5.mp4" type="video/mp4">
-    </video>
-</p>
 
 Great work - you've added a template scene definition to your experiment project using psyanim-cli!
 

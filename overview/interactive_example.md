@@ -275,9 +275,21 @@ e.g. if the "projectId" from your `firebase.config.json` was "myTestProject", th
 npm run firebase-deploy-rules 
 ```
 
-Now, if you navigate to your Firestore console in one Chrome tab (as described in [Firebase Setup tutorial](/overview/firebase_setup.md)), you should see your database is empty (unless you've already run some experiments before doing this tutorial).
+Now, if you navigate to your Firestore console in one Chrome tab (as described in [Firebase Setup tutorial](/overview/firebase_setup.md)), you should see your database is empty (unless you've already run some experiments before doing this tutorial):
 
-Open up another tab and load your experiment page.  As you run through the experiment, you can refresh your Firestore console page to see there are new firebase documents being added to the `trial-metadata` collection.
+<p align="center" style="font-size: 12px;">
+    <img src="./imgs/cloud-firestore-console-empty-db.png"/>
+    <br>Empty Firestore Database Shown in Firestore Console
+    <!-- <br>Your caption goes here -->
+</p>
+
+Open up another tab and load your experiment page.  As you run through the experiment, you can refresh your Firestore console page to see there are new firebase documents being added to the `trial-metadata` collection:
+
+<p align="center" style="font-size: 12px;">
+    <img src="./imgs/cloud-firestore-console-with-data.png"/>
+    <br>Firestore Console shows data has been written
+    <!-- <br>Your caption goes here -->
+</p>
 
 Great work!  To recap, getting the PsyanimJsPsychPlugin writing data out to `Google Firebase Firestore` during an experiment was as easy as:
 

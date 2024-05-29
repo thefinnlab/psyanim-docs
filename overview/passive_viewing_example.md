@@ -2,6 +2,12 @@
 
 ## 1. Overview and Project Setup
 
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/passive-viewing-section1.mp4" type="video/mp4">
+    </video>
+</p>
+
 Sometimes, an experiment may not require any control input from the user and is designed to only be observed passively.
 
 In these instances, researchers have even more control over the quality and types of agent-based animations that are presented to the user, since many stochastic simulations can be generated offline and hand-picked for quality control before experiments are deployed.
@@ -44,13 +50,13 @@ In another terminal, start a local development server from the project root with
 
 Open a chrome browser and navigate to `localhost:3000` and your jsPsych experiment should have a single psyanim-2 trial, with a predator and prey agent in it.
 
+## 2. Simulating Agent Trajectories
+
 <p align="center" style="font-size: 12px;">
     <video width="640" height="360" controls>
-    <source src="./videos/passive-viewing-section1.mp4" type="video/mp4">
+    <source src="./videos/passive-viewing-section2.mp4" type="video/mp4">
     </video>
 </p>
-
-## 2. Simulating Agent Trajectories
 
 Now that we've created an experiment project to simulate agent trajectories, we just need to set this project up to save those trajectories to firebase.
 
@@ -158,15 +164,15 @@ Before you proceed, make sure you ran through your experiment in the browser at 
 
 If you don't see these, then run through your experiment & code one more time to make sure you have trajectories to use in the next section.
 
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/passive-viewing-section2.mp4" type="video/mp4">
-    </video>
-</p>
-
 Great work - you've setup a predator-prey v2 experiment project that you can use to generate trajectories to be used for passive viewing in other online experiments.
 
 ## 3. Quality-Control with Experiment Viewer
+
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/passive-viewing-section3.mp4" type="video/mp4">
+    </video>
+</p>
 
 In the previous section, we created an experiment project to generate agent trajectories (`step 1`) that we saved to Firebase so that we can QC these simulated trajectories (`step 2`) before deploying them in an online experiment (`step 3`).
 
@@ -213,12 +219,6 @@ Now, you should be able to navigate to `localhost:7000` in your Chrome browser t
 
 You should be able to view the animations for trials in your database using `j` and `k` keys to cycle through them and `spacebar` to restart the current animation.
 
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/passive-viewing-section3.mp4" type="video/mp4">
-    </video>
-</p>
-
 ---
 
 Note that the experiment viewer app server loads trial + animation clip data from firestore when you start the server (using the `npm run serve`) command.
@@ -236,6 +236,12 @@ We can also create custom queries to run against our Firebase database using `Ps
 In the next sections, we'll learn how to create and perform custom queries with `Psyanim-CLI` and how to create `custom dataproviders` to filter data loaded by experiment viewer.
 
 ## 4. Firebase Query Scripts
+
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/passive-viewing-section4.mp4" type="video/mp4">
+    </video>
+</p>
 
 `Psyanim-CLI` has the ability to run custom `query scripts` against your Firebase Firestore instances, allowing users to read, edit, and write data to/from Firebase cloud instances.
 
@@ -377,15 +383,15 @@ As you browse the various trials that are loaded, you should notice the followin
 
 `Users A-E` are from the sample data-set we just uploaded to Firebase using our `restoreCloudDB.js` query script.
 
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/passive-viewing-section4.mp4" type="video/mp4">
-    </video>
-</p>
-
 Great work!  You created your first `custom query script` to upload data to Firebase from your local disk and verified it using `Firebase console` as well as `Psyanim Experiment Viewer`!
 
 ## 5. Custom Data Providers
+
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/passive-viewing-section5.mp4" type="video/mp4">
+    </video>
+</p>
 
 Now that we've got data from 6 different users in our Firebase cloud database, we can take this opportunity to write our first `custom dataprovider` to only load a subset of the data in our Firebase instance for viewing in the experiment viewer app.
 
@@ -450,12 +456,6 @@ This time, experiment viewer will load the `myUserACEJasonDataProvider.js` at st
 
 Reload the experiment viewer app in your Chrome browser (at `localhost:7000`) and you should see that you now only have data for user IDs: `UserA`, `UserC`, `UserE`, and `Jason`.
 
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/passive-viewing-section5.mp4" type="video/mp4">
-    </video>
-</p>
-
 Great work - you've written your first custom dataprovider for Psyanim Experiment Viewer!
 
 There are many ways you can filter the data, and even do local filtering, but the fundamental workflow doesn't change:
@@ -465,6 +465,12 @@ There are many ways you can filter the data, and even do local filtering, but th
 3. Start Experiment Viewer server, pointing it to the location of the custom data provider.
 
 ## 6. Selecting Trials for Playback
+
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/passive-viewing-section6.mp4" type="video/mp4">
+    </video>
+</p>
 
 In the previous sections, we created an experiment project to simulate `predator-prey v2` interactions and save the results of those experiment runs off to Firebase.
 
@@ -533,15 +539,15 @@ The `Trial Collection File` schema is very simple.  If you open up `./trial_coll
 
 For each trial object in the `Trial Collection File` JSON array, you can also add agent names to the `excludeAgents` field of the object and those agents will be ommitted from playback in our experiment.
 
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/passive-viewing-section6.mp4" type="video/mp4">
-    </video>
-</p>
-
 Great work!  Now that we've selected trials from our Firebase Firestore database that we want to use in our experiments, it's time to build our experiment to play back these trials for test subjects.
 
 ## 7. Creating Our Experiment
+
+<p align="center" style="font-size: 12px;">
+    <video width="640" height="360" controls>
+    <source src="./videos/passive-viewing-section7.mp4" type="video/mp4">
+    </video>
+</p>
 
 Now all that's left to do is create our experiment project to deploy and playback the recorded trials that we hand-selected for our test subjects.
 
@@ -562,12 +568,6 @@ And that should be it!  The `experiment player template project` is designed to 
 Start a watch service in one terminal using `npm run watch` to keep your code bundled and then start up the dev server with `npm run serve` in another terminal and load your experiment in the browser at `localhost:3000`.
 
 You should see each trial play with an `HTML Keyboard Response` trial waiting for a keypress in between each one.
-
-<p align="center" style="font-size: 12px;">
-    <video width="640" height="360" controls>
-    <source src="./videos/passive-viewing-section7.mp4" type="video/mp4">
-    </video>
-</p>
 
 ---
 
