@@ -1,4 +1,4 @@
-# <ins>Artificial Intelligence in Psyanim-2</ins>
+# <ins>Intro to Artificial Intelligence in Psyanim-2</ins>
 
 ***Note: Full tutorial project + source code can be found [here](https://github.com/thefinnlab/hello-psyanim2) in the `artificial_intelligence` branch.***
 
@@ -239,7 +239,11 @@ Prior the advent of [behavior trees](https://en.wikipedia.org/wiki/Behavior_tree
 
 While `behavior trees` have certainly become the de facto standard for most games today due to their flexibility and ease of reuse, they are often still combined with `finite state machines` to produce even more sophisticated behaviors.
 
-`Psyanim 2`'s decision-making framework offers `finite state machines` (or *FSMs*) via the `PsyanimFSM` and `PsyanimFSMState` classes.
+`Psyanim 2`'s decision-making framework offers both `behavior trees` and `finite state machines` (or *FSMs*) via the `PsyanimFSM` and `PsyanimFSMState` classes.
+
+In this tutorial, we'll discuss `finite state machines` in great detail.
+
+In the next tutorial, we'll dive deeper into `behavior trees`.
 
 One big advantage of a state machine is that it can be easily visualized and reasoned about using simple boxes and arrows.
 
@@ -570,7 +574,7 @@ While `psyanim2` does not have full support for `hierarchical FSMs` at the momen
 
 This simpler hierarchical FSM, called `PsyanimBasicHFSM`, is implemented similar to [pushdown automata](https://en.wikipedia.org/wiki/Pushdown_automaton), but with entire sub-state machines rather than just states, so a 'history' of states is automatically kept internally in the underlying stack data structure and the hierarchy is enforced by position within the stack.
 
-That said, `psyanim2` can always be extended with full-featured `heirarchical FSMs` or `behavior trees` (or a hybrid of the two) at a later time should the need arise.
+That said, `psyanim2` can always be extended with full-featured `heirarchical FSMs` (or a hybrid of the two) at a later time should the need arise.
 
 ---
 
