@@ -59,9 +59,17 @@ With that in mind, here is a video that walks you through the usage of `psyanim-
     </video>
 </p>
 
+This next video goes more in-depth, discussing behavior designer config files, blackboard files, hard-coding task parameters vs. using the blackboard for them, the behavior tree debugger and much more, while also building a slightly more complex tree:
+
+<p align="center">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/C8Fqbk3y8AU?si=Hz3_7Qbf5aFIRXf5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</p>
+
 ## 3. Behavior Designer Cheat-sheet
 
 Here's a quick and dirty list of controls for behavior designer, (but you can see them all used in the video in the previous section!):
+
+- To run behavior designer using a different config file, the syntax is: `npm run serve -- <path-to-config-file.json>`, e.g. `npm run server -- ./myconfig.json`
 
 - Right-click or press `space bar` in the graph editor canvas area to open the context menu with available nodes
 

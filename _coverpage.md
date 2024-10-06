@@ -1,6 +1,6 @@
 <!-- _coverpage.md -->
 
-# psyanim <small>2.0</small>
+# psyanim <small>3.0</small>
 
 > A 2D procedural animation tool for interactive, browser-based behavioral experiments.
 
